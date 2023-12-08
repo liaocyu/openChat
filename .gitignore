@@ -19,6 +19,9 @@ demo-client/.flattened-pom.xml
 # BlueJ files
 *.ctxt
 
+# Build Project
+target
+
 
 # Package Files #
 *.jar

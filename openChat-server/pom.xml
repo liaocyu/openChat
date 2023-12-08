@@ -21,6 +21,7 @@
         <dependency>
             <groupId>com.liaocyu</groupId>
             <artifactId>openChat-common-starter</artifactId>
+            <version>${version}</version>
         </dependency>
     </dependencies>
 
