@@ -48,12 +48,12 @@
 
     <dependencyManagement>
         <dependencies>
-            <!--<dependency>
-                <groupId>com.abin.mallchat</groupId>
-                <artifactId>mallchat-common-starter</artifactId>
+            <dependency>
+                <groupId>com.liaocyu</groupId>
+                <artifactId>openChat-common-starter</artifactId>
                 <version>${version}</version>
             </dependency>
-            <dependency>
+            <!--<dependency>
                 <groupId>com.abin.mallchat</groupId>
                 <artifactId>mallchat-oss-starter</artifactId>
                 <version>${version}</version>

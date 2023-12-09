@@ -1,5 +1,6 @@
 package com.liaocyu.openChat;
 
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletComponentScan;
@@ -12,6 +13,7 @@ import org.springframework.boot.web.servlet.ServletComponentScan;
  */
 @SpringBootApplication
 @ServletComponentScan
+@MapperScan({"com.liaocyu.openChat.common.user.mapper"})
 public class openChatServerApplication {
     public static void main(String[] args) {
         SpringApplication.run(openChatServerApplication.class , args);

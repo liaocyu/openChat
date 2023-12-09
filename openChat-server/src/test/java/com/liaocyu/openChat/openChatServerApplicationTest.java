@@ -2,20 +2,20 @@ package com.liaocyu.openChat;
 
 import com.liaocyu.openChat.common.user.dao.UserDao;
 import com.liaocyu.openChat.common.user.domain.entity.User;
-import com.liaocyu.openChat.common.user.service.IUserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 /**
  * @author : create by lcy
  * @Project : openChat
- * @createTime : 2023/12/8 21:59
+ * @createTime : 2023/12/8 23:09
  * @description :
  */
 @SpringBootTest
-public class DaoTest {
-
+class openChatServerApplicationTest {
     @Autowired
     private UserDao userDao;
 
