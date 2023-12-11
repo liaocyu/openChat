@@ -13,6 +13,7 @@ import java.util.Map;
 
 /**
  * @author <a href="https://github.com/binarywang">Binary Wang</a>
+ * 用户订阅的通知
  */
 @Component
 public class SubscribeHandler extends AbstractHandler {
@@ -25,7 +26,7 @@ public class SubscribeHandler extends AbstractHandler {
                                     WxSessionManager sessionManager) throws WxErrorException {
 
         this.logger.info("新关注用户 OPENID: " + wxMessage.getFromUser());
-
+        // TODO 用户扫码 事件码：2_qrscene
         WxMpXmlOutMessage responseResult = null;
         try {
             responseResult = this.handleSpecial(weixinService, wxMessage);

@@ -30,13 +30,16 @@ import static me.chanjar.weixin.common.api.WxConsts.XmlMsgType.EVENT;
 @AllArgsConstructor
 @Configuration
 @EnableConfigurationProperties(WxMpProperties.class)
-public class WxMpConfiguration {
+public class   WxMpConfiguration {
+    /**
+     * 扫码过后所调用的处理器
+     */
     private final LogHandler logHandler;
     private final MsgHandler msgHandler;
     private final SubscribeHandler subscribeHandler;
     private final ScanHandler scanHandler;
     private final WxMpProperties properties;
-
+    /*微信最核心的配置 制定了微信让我们填的AppId、Secret、Token*/
     @Bean
     public WxMpService wxMpService() {
         // 代码里 getConfigs()处报错的同学，请注意仔细阅读项目说明，你的IDE需要引入lombok插件！！！！
@@ -59,7 +62,7 @@ public class WxMpConfiguration {
                 }).collect(Collectors.toMap(WxMpDefaultConfigImpl::getAppId, a -> a, (o, n) -> o)));
         return service;
     }
-
+    /*将微信传给我们的消息进行解析匹配 匹配给我们的 Handler */
     @Bean
     public WxMpMessageRouter messageRouter(WxMpService wxMpService) {
         final WxMpMessageRouter newRouter = new WxMpMessageRouter(wxMpService);

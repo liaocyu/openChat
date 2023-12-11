@@ -4,11 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
 import me.chanjar.weixin.common.bean.oauth2.WxOAuth2AccessToken;
+import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.mp.api.WxMpMessageRouter;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlOutMessage;
+import me.chanjar.weixin.mp.bean.result.WxMpQrCodeTicket;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
@@ -24,10 +27,29 @@ import org.springframework.web.servlet.view.RedirectView;
 @RequestMapping("wx/portal/public")
 public class WxPortalController {
 
+    @Autowired
+    private WxMpService wxMpService;
+    @GetMapping("test")
+    public String test(@RequestParam Integer code) throws WxErrorException {
+        WxMpQrCodeTicket wxMpQrCodeTicket = wxMpService.getQrcodeService().qrCodeCreateTmpTicket(code, 10000);
+        String url = wxMpQrCodeTicket.getUrl();
+        System.out.println(url);
+        return url;
+    }
+
+
     private final WxMpService wxService;
     private final WxMpMessageRouter messageRouter;
 /*    private final WxMsgService wxMsgService;*/
 
+    /**
+     * 验证消息的确来自微信服务器
+     * @param signature 微信加密签名【结合了开发者填写的 token参数和请求中的timestamp参数、nonce参数】
+     * @param timestamp 事件戳
+     * @param nonce 随机数
+     * @param echostr 随机字符串
+     * @return 原样返回 echostr 参数内容
+     */
     @GetMapping(produces = "text/plain;charset=utf-8")
     public String authGet(@RequestParam(name = "signature", required = false) String signature,
                           @RequestParam(name = "timestamp", required = false) String timestamp,
@@ -40,7 +62,15 @@ public class WxPortalController {
             throw new IllegalArgumentException("请求参数非法，请核实!");
         }
 
-
+        /**
+         * 开发者通过检验signature对请求进行校验（下面有校验方式）。若确认此次GET请求来自微信服务器，请原样返回echostr参数内容，则接入生效，成为开发者成功，否则接入失败。加密/校验流程如下：
+         *
+         * 1）将token、timestamp、nonce三个参数进行字典序排序
+         *
+         * 2）将三个参数字符串拼接成一个字符串进行sha1加密
+         *
+         * 3）开发者获得加密后的字符串可与signature对比，标识该请求来源于微信
+         */
         if (wxService.checkSignature(timestamp, nonce, signature)) {
             return echostr;
         }
@@ -48,8 +78,14 @@ public class WxPortalController {
         return "非法请求";
     }
 
+    /**
+     * 扫码成功后的微信回调地址
+     * @param code
+     * @return
+     * @throws WxErrorException
+     */
     @GetMapping("/callBack")
-    public RedirectView callBack(@RequestParam String code) {
+    public RedirectView callBack(@RequestParam String code) throws WxErrorException {
         /*try {
             WxOAuth2AccessToken accessToken = wxService.getOAuth2Service().getAccessToken(code);
             WxOAuth2UserInfo userInfo = wxService.getOAuth2Service().getUserInfo(accessToken, "zh_CN");
@@ -57,11 +93,14 @@ public class WxPortalController {
         } catch (Exception e) {
             log.error("callBack error", e);
         }*/
+        WxOAuth2AccessToken accessToken = wxService.getOAuth2Service().getAccessToken(code);
+        WxOAuth2UserInfo userInfo = wxService.getOAuth2Service().getUserInfo(accessToken, "zh_CN");
+        System.out.println(userInfo);
         RedirectView redirectView = new RedirectView();
         redirectView.setUrl("https://mp.weixin.qq.com/s/m1SRsBG96kLJW5mPe4AVGA");
         return redirectView;
     }
-
+    // 微信给我们的消息会请求这个接口
     @PostMapping(produces = "application/xml; charset=UTF-8")
     public String post(@RequestBody String requestBody,
                        @RequestParam("signature") String signature,
@@ -81,7 +120,7 @@ public class WxPortalController {
         String out = null;
         if (encType == null) {
             // 明文传输的消息
-            WxMpXmlMessage inMessage = WxMpXmlMessage.fromXml(requestBody);
+            WxMpXmlMessage inMessage = WxMpXmlMessage.fromXml(requestBody);// 微信的所有消息就在这个 requestBody里面
             WxMpXmlOutMessage outMessage = this.route(inMessage);
             if (outMessage == null) {
                 return "";
