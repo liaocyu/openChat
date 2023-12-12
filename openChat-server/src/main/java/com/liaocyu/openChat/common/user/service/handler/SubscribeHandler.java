@@ -1,11 +1,14 @@
 package com.liaocyu.openChat.common.user.service.handler;
 
 
+import com.liaocyu.openChat.common.user.service.WXMsgServeice;
+import com.liaocyu.openChat.common.user.service.adapter.TextBuilder;
 import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.common.session.WxSessionManager;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlOutMessage;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,8 +20,9 @@ import java.util.Map;
  */
 @Component
 public class SubscribeHandler extends AbstractHandler {
-    /*@Autowired
-    private WxMsgService wxMsgService;*/
+    @Autowired
+    WXMsgServeice wxMsgServeice;
+
 
     @Override
     public WxMpXmlOutMessage handle(WxMpXmlMessage wxMessage,
@@ -26,10 +30,11 @@ public class SubscribeHandler extends AbstractHandler {
                                     WxSessionManager sessionManager) throws WxErrorException {
 
         this.logger.info("新关注用户 OPENID: " + wxMessage.getFromUser());
-        // TODO 用户扫码 事件码：2_qrscene
+
         WxMpXmlOutMessage responseResult = null;
         try {
-            responseResult = this.handleSpecial(weixinService, wxMessage);
+            // responseResult = this.handleSpecial(weixinService, wxMessage);
+            responseResult = wxMsgServeice.scan(wxMessage);
         } catch (Exception e) {
             this.logger.error(e.getMessage(), e);
         }
@@ -38,13 +43,7 @@ public class SubscribeHandler extends AbstractHandler {
             return responseResult;
         }
 
-        try {
-            // return new TextBuilder().build("感谢关注", wxMessage, weixinService);
-        } catch (Exception e) {
-            this.logger.error(e.getMessage(), e);
-        }
-
-        return null;
+        return  TextBuilder.build("感谢关注",  wxMessage);
     }
 
     /**

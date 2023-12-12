@@ -15,4 +15,12 @@ public interface WebSocketService {
     void handleLoginReq(Channel channel);
 
     void remove(Channel channel);
+
+    void scanLoginSuccess(Integer code, Long id);
+
+    /**
+     * 等待用户授权
+     * @param code 授权码
+     */
+    void waitAuthorize(Integer code);
 }

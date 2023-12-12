@@ -1,5 +1,6 @@
 package com.liaocyu.openChat.common.user.controller;
 
+import com.liaocyu.openChat.common.user.service.WXMsgServeice;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
@@ -29,6 +30,10 @@ public class WxPortalController {
 
     @Autowired
     private WxMpService wxMpService;
+
+    @Autowired
+    private WXMsgServeice wxMsgServeice;
+
     @GetMapping("test")
     public String test(@RequestParam Integer code) throws WxErrorException {
         WxMpQrCodeTicket wxMpQrCodeTicket = wxMpService.getQrcodeService().qrCodeCreateTmpTicket(code, 10000);
@@ -96,7 +101,9 @@ public class WxPortalController {
         WxOAuth2AccessToken accessToken = wxService.getOAuth2Service().getAccessToken(code);
         WxOAuth2UserInfo userInfo = wxService.getOAuth2Service().getUserInfo(accessToken, "zh_CN");
         System.out.println(userInfo);
+        wxMsgServeice.authorize(userInfo);
         RedirectView redirectView = new RedirectView();
+        // TODO 返回自己的网站
         redirectView.setUrl("https://mp.weixin.qq.com/s/m1SRsBG96kLJW5mPe4AVGA");
         return redirectView;
     }
