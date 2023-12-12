@@ -65,7 +65,7 @@ public class NettyWebSocketServer {
         // 服务器启动引导对象
         ServerBootstrap serverBootstrap = new ServerBootstrap();
         serverBootstrap.group(bossGroup, workerGroup)
-                .channel(NioServerSocketChannel.class)
+                .channel(NioServerSocketChannel.class) // 服务器的 ServerSocketChannel 实现
                 .option(ChannelOption.SO_BACKLOG, 128)
                 .option(ChannelOption.SO_KEEPALIVE, true)
                 .handler(new LoggingHandler(LogLevel.INFO)) // 为 bossGroup 添加 日志处理器

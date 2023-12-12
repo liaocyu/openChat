@@ -173,3 +173,31 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Tex
     }
 }
 ```
+
+#### 事件
+
+channelActive(ChannelHandlerContext ctx) 方法：
+
+1、该方法在通道激活时被调用，表示与远程对等方建立了连接。
+2、当与客户端建立起连接并且通道处于活动状态时，该方法将被触发。
+3、一般可以在这里执行与客户端建立连接后的初始化工作或发送初始消息等操作。
+userEventTriggered(ChannelHandlerContext ctx, Object evt) 方法：
+
+userEventTriggered(ChannelHandlerContext ctx, Object evt) 方法：
+
+1、该方法在自定义事件被触发时被调用。
+2、Netty 允许用户触发自定义事件，可以通过 ChannelPipeline 发送事件来通知 ChannelHandler。
+3、这个方法可以用来处理自定义事件，例如心跳检测、空闲超时等。
+4、evt 参数表示触发的自定义事件对象，可以根据具体的事件类型进行处理。
+
+
+
+channelRead0(ChannelHandlerContext channelHandlerContext, TextWebSocketFrame textWebSocketFrame) 方法：
+
+1、该方法在接收到新的消息时被调用。
+2、当从客户端接收到数据帧（Frame）时，该方法将被触发。
+3、TextWebSocketFrame 是 Netty 提供的用于处理文本 WebSocket 帧的特定类型。
+4、可以在这里处理客户端发送的消息，例如解析消息内容、处理业务逻辑、给客户端发送响应等操作。
+
+
+
