@@ -1,6 +1,5 @@
 package com.liaocyu.openChat.common.websocket;
 
-import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.json.JSONUtil;
 import com.liaocyu.openChat.common.websocket.domian.enums.WSReqTypeEnum;

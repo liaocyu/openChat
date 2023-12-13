@@ -32,7 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @createTime : 2023/12/11 13:41
  * @description :
  * 处理用户的登录逻辑、发送消息的逻辑
- * 使用了两个 Map；使用 caffeine 来关联登录码和channel
+ * 使用了两个 Map；使用 caffeine 来关联登录码code和channel
  *               使用 ConcurrentHashMap 来关联 channel 和 WSChannelExtraDTO 实体类对象
  */
 @Service
@@ -110,7 +110,6 @@ public class WebSocketServiceImpl implements WebSocketService {
         String token = loginService.login(id);
         // 用户登录
         sendMsg(channel , WebSocketAdapter.buildResp(user , token));
-
     }
 
     @Override
