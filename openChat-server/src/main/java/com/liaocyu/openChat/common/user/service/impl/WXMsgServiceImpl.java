@@ -73,7 +73,7 @@ public class WXMsgServiceImpl implements WXMsgServeice {
         if (registered && authorized) {
             // 走登录成功逻辑 通过code 找到channel 推送消息
             webSocketService.scanLoginSuccess(code , user.getId());
-            return null;
+            /*return null;*/
         }
         // 用户没有注册 ， 先注册
         if(!registered) {
