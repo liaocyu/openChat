@@ -42,4 +42,10 @@ public class WebSocketAdapter {
         resp.setType(WSRespTypeEnum.LOGIN_SCAN_SUCCESS.getType());
         return resp;
     }
+    // 通知前端清除token
+    public static WSBaseResp<?> buildInvalidToeknResp() {
+        WSBaseResp<WSLoginUrl> resp = new WSBaseResp<>();
+        resp.setType(WSRespTypeEnum.INVALIDATE_TOKEN.getType());
+        return resp;
+    }
 }

@@ -1,10 +1,12 @@
 package com.liaocyu.openChat.common.websocket;
 
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.json.JSONUtil;
 import com.liaocyu.openChat.common.websocket.domian.enums.WSReqTypeEnum;
 import com.liaocyu.openChat.common.websocket.domian.vo.req.WSBaseReq;
 import com.liaocyu.openChat.common.websocket.service.WebSocketService;
+import com.liaocyu.openChat.common.websocket.utils.NettyUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
@@ -13,6 +15,8 @@ import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
+import io.netty.util.Attribute;
+import io.netty.util.AttributeKey;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -57,13 +61,15 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Tex
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         // 如果这个事件是一个握手完成的事件
         if(evt instanceof WebSocketServerProtocolHandler.HandshakeComplete) {
-            System.out.println("握手完成");
+            String token = NettyUtil.getAttr(ctx.channel(), NettyUtil.TOKEN);
+            if(StrUtil.isNotBlank(token)) {
+                webSocketService.authorize(ctx.channel() , token);
+            }
         } else if (evt instanceof IdleStateEvent) {
             IdleStateEvent event = (IdleStateEvent) evt;
             if(event.state() == IdleState.READER_IDLE) {
                 System.out.println("读空闲");
-                // TODO 用户下线
-                ctx.channel().close();
+                userOffline(ctx.channel());
             }
         }
     }
@@ -92,6 +98,10 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Tex
         WSBaseReq wsBaseReq = JSONUtil.toBean(text, WSBaseReq.class);
         switch (WSReqTypeEnum.of(wsBaseReq.getType())) {
             case AUTHORIZE:
+                // wsBaseReq.getData() 用户传入进来的 token
+                // 使用token保存 websocket 连接
+                webSocketService.authorize(channelHandlerContext.channel() , wsBaseReq.getData());
+                break;
             case HEARTBEAT:
                 break;
             case LOGIN:

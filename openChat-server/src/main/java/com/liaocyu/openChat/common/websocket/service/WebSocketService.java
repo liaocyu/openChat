@@ -23,4 +23,12 @@ public interface WebSocketService {
      * @param code 授权码
      */
     void waitAuthorize(Integer code);
+
+    /**
+     * 握手认证
+     *
+     * @param channel 用户的连接
+     * @param token 用户传入的 toekn
+     */
+    void authorize(Channel channel, String token);
 }

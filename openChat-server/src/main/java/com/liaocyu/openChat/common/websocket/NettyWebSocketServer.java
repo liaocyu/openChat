@@ -14,7 +14,6 @@ import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
-import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.NettyRuntime;
 import io.netty.util.concurrent.Future;
 import lombok.extern.slf4j.Slf4j;
@@ -85,7 +84,8 @@ public class NettyWebSocketServer {
                          *  2. 这就是为什么当浏览器发送大量数据时，就会发出多次 http请求的原因
                          */
                         pipeline.addLast(new HttpObjectAggregator(8192));
-                        //保存用户ip
+                        //保存请求头
+                        pipeline.addLast(new MyHanderCollectHandler());
                         // pipeline.addLast(new HttpHeadersHandler());
                         /**
                          * 说明：
@@ -96,8 +96,9 @@ public class NettyWebSocketServer {
                          *      是通过一个状态码 101 来切换的
                          */
                         pipeline.addLast(new WebSocketServerProtocolHandler("/"));
-                        // 自定义handler ，处理业务逻辑
-                        pipeline.addLast(NETTY_WEB_SOCKET_SERVER_HANDLER);
+                        // pipeline.addLast(new MyHanderCollectHandler()); // 添加自定义websocket 连接处理器
+                        pipeline.addLast(new NettyWebSocketServerHandler());
+                        //pipeline.addLast(NETTY_WEB_SOCKET_SERVER_HANDLER); // 自定义handler ，处理业务逻辑
                     }
                 });
         // 启动服务器，监听端口，阻塞直到启动成功
