@@ -15,12 +15,10 @@ import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
-import io.netty.util.Attribute;
-import io.netty.util.AttributeKey;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * webSocket请求处理器
+ * 自定义webSocket请求处理器
  */
 @Slf4j
 @Sharable
@@ -51,8 +49,7 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Tex
     }
 
     /**
-     * 该方法在自定义事件被触发时被调用
-     *
+     * 用户事件处理器
      * @param ctx
      * @param evt 表示触发的自定义事件对象，根据具体的事件类型进行处理
      * @throws Exception
@@ -65,6 +62,7 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Tex
             if(StrUtil.isNotBlank(token)) {
                 webSocketService.authorize(ctx.channel() , token);
             }
+            // 这个事件是一个断开连接的事件
         } else if (evt instanceof IdleStateEvent) {
             IdleStateEvent event = (IdleStateEvent) evt;
             if(event.state() == IdleState.READER_IDLE) {

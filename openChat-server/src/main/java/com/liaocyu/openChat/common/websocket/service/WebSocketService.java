@@ -12,6 +12,10 @@ public interface WebSocketService {
 
     void connect(Channel channel);
 
+    /**
+     * 处理用户首次登录
+     * @param channel
+     */
     void handleLoginReq(Channel channel);
 
     void remove(Channel channel);

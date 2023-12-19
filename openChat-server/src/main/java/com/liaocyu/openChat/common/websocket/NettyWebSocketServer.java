@@ -27,15 +27,17 @@ import javax.annotation.PreDestroy;
  * @Project : openChat
  * @createTime : 2023/12/8 11:54
  * @description :
+ * 创建 WebSocket 服务器
  */
 @Slf4j
 @Configuration
 public class NettyWebSocketServer {
-    public static final int WEB_SOCKET_PORT = 8090;
+    public static final int WEB_SOCKET_PORT = 8090; // webSocket 服务器监听端口
+    // 自定义的 NettyWebSocketServerHandler 对象。
     public static final NettyWebSocketServerHandler NETTY_WEB_SOCKET_SERVER_HANDLER = new NettyWebSocketServerHandler();
     // 创建线程池执行器
-    private EventLoopGroup bossGroup = new NioEventLoopGroup(1);
-    private EventLoopGroup workerGroup = new NioEventLoopGroup(NettyRuntime.availableProcessors());
+    private EventLoopGroup bossGroup = new NioEventLoopGroup(1); // 接收客户端连接的主线程池，使用 NioEventLoopGroup
+    private EventLoopGroup workerGroup = new NioEventLoopGroup(NettyRuntime.availableProcessors()); // 用于处理客户端连接的工作线程
 
     /**
      * 启动 ws server
@@ -74,10 +76,9 @@ public class NettyWebSocketServer {
                         ChannelPipeline pipeline = socketChannel.pipeline();
                         //30秒客户端没有向服务器发送心跳则关闭连接
                         // pipeline.addLast(new IdleStateHandler(30, 0, 0));
-                        // 因为使用http协议，所以需要使用http的编码器，解码器
-                        pipeline.addLast(new HttpServerCodec());
+                        pipeline.addLast(new HttpServerCodec()); // 因为使用http协议，所以需要使用http的编码器，解码器;第一次是http请求，需要使用 http编码器
                         // 以块方式写，添加 chunkedWriter 处理器
-                        pipeline.addLast(new ChunkedWriteHandler());
+                        pipeline.addLast(new ChunkedWriteHandler()); // 支持异步发送大的码流，防止内存溢出
                         /**
                          * 说明：
                          *  1. http数据在传输过程中是分段的，HttpObjectAggregator可以把多个段聚合起来；
@@ -95,9 +96,9 @@ public class NettyWebSocketServer {
                          *  4. WebSocketServerProtocolHandler 核心功能是把 http协议升级为 ws 协议，保持长连接；
                          *      是通过一个状态码 101 来切换的
                          */
-                        pipeline.addLast(new WebSocketServerProtocolHandler("/"));
+                        pipeline.addLast(new WebSocketServerProtocolHandler("/")); //  /表示webSocket请求路径
                         // pipeline.addLast(new MyHanderCollectHandler()); // 添加自定义websocket 连接处理器
-                        pipeline.addLast(new NettyWebSocketServerHandler());
+                        pipeline.addLast(new NettyWebSocketServerHandler()); // 自定义的 WebSocket 业务处理器，处理具体的业务逻辑。
                         //pipeline.addLast(NETTY_WEB_SOCKET_SERVER_HANDLER); // 自定义handler ，处理业务逻辑
                     }
                 });

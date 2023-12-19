@@ -11,6 +11,10 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
 
+/**
+ * 自建项目线程池
+ * 没有用Excutors快速创建。是因为Excutors创建的线程池用的无界队列，有oom的风险
+ */
 @Configuration
 @EnableAsync
 public class ThreadPoolConfig implements AsyncConfigurer {
@@ -25,20 +29,22 @@ public class ThreadPoolConfig implements AsyncConfigurer {
 
     @Override
     public Executor getAsyncExecutor() {
-        return mallchatExecutor();
+        return openchatExecutor();
+       /* return mallchatExecutor();*/
+
     }
 
     @Bean(OPENCHAT_EXECUTOR)
     @Primary
-    public ThreadPoolTaskExecutor mallchatExecutor() {
+    public ThreadPoolTaskExecutor openchatExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setWaitForTasksToCompleteOnShutdown(true);
         executor.setCorePoolSize(10);
         executor.setMaxPoolSize(10);
         executor.setQueueCapacity(200);
-        executor.setThreadNamePrefix("openchat-executor-");
+        executor.setThreadNamePrefix("openchat-executor-"); // 设置线程前缀 排查 cpu占用问题
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());// 满了调用线程执行，认为重要任务
-        executor.setThreadFactory(new MyThreadFactory(executor));
+        executor.setThreadFactory(new MyThreadFactory(executor)); // 指定线程池的线程工厂
         executor.initialize();
         return executor;
     }

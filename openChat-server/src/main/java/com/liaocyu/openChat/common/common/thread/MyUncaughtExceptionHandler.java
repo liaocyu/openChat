@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
  * @Project : openChat
  * @createTime : 2023/12/13 14:41
  * @description :
+ * 自定义处理异常
  */
 @Slf4j
 public class MyUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {

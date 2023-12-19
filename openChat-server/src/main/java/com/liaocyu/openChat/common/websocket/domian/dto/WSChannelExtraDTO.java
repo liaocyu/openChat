@@ -7,7 +7,7 @@ import lombok.Data;
  * @Project : openChat
  * @createTime : 2023/12/11 13:44
  * @description : channel 关联的信息
- * 讲用户的 channel 为键，WSChannelExtraDTO 为值保存在 concurrentHashMap
+ * 将用户的 channel 为键，WSChannelExtraDTO 为值保存在 concurrentHashMap
  */
 @Data
 public class WSChannelExtraDTO {

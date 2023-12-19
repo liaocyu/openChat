@@ -70,7 +70,9 @@ public class WebSocketServiceImpl implements WebSocketService {
     }
 
     /**
+     * 处理用户的首次登录请求
      * 前端点击登录 会发出一个请求登录二维码的 webSocket 信息
+     * 使用 caffeine ，将code 为键 ，channel 为值 保存用户的 channel
      * @param channel
      */
     @Override
@@ -81,7 +83,7 @@ public class WebSocketServiceImpl implements WebSocketService {
         // 2、请求微信接口 ，获取登录码地址
         WxMpQrCodeTicket wxMpQrCodeTicket = null;
         try {
-            // 微信码凭证
+            // 微信码凭证【票据】
             wxMpQrCodeTicket = wxMpService.getQrcodeService().qrCodeCreateTmpTicket(code, (int) DURATION.getSeconds());
         } catch (WxErrorException e) {
             throw new RuntimeException(e);
@@ -122,7 +124,7 @@ public class WebSocketServiceImpl implements WebSocketService {
         sendMsg(channel , WebSocketAdapter.buildwaitAuthorize());
     }
 
-    // 使用toekn 来保存用户的 websocket 的连接
+    // 用户token 认证
     @Override
     public void authorize(Channel channel, String token) {
         // 首先判断token 是否有效

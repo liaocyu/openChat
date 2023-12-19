@@ -108,4 +108,12 @@ class openChatServerApplicationTest {
         Thread.sleep(2000);
     }
 
+    @Test
+    void getUser() {
+        // Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOjEwNDQzLCJjcmVhdGVUaW1lIjoxNzAyOTY0ODk3fQ.iAa4KrgcZfk8zOAe1u3uo96n_2DcHO6eRIvmy8X0cb4
+
+        String login = loginService.login(10443L);
+        System.out.println(login);
+    }
+
 }

@@ -29,6 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @Project : openChat
  * @createTime : 2023/12/12 10:31
  * @description :
+ * weixin 消息业务处理
  */
 @Service
 @Slf4j
@@ -57,6 +58,11 @@ public class WXMsgServiceImpl implements WXMsgServeice {
     WxMpService wxMpService;
 
 
+    /**
+     * 微信信息请求对象
+     * @param wxMpXmlMessage
+     * @return
+     */
     @Override
     public WxMpXmlOutMessage scan(WxMpXmlMessage wxMpXmlMessage) {
         String openId = wxMpXmlMessage.getFromUser();
