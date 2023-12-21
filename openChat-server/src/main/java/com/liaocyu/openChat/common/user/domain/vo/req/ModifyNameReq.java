@@ -21,7 +21,5 @@ public class ModifyNameReq {
     @Length(max = 6 , message = "用户名不可以取太长，不然记不住")
     private String name;
 
-    @NotNull() // 这个注解在可以有默认的提示的
-    private Integer id;
 
 }

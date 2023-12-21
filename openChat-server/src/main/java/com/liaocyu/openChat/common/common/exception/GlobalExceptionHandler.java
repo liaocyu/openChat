@@ -29,12 +29,25 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * 捕获业务异常 进行异常处理
+     * @param e
+     * @return
+     */
+    @ExceptionHandler(value = BusinessException.class)
+    public ApiResult<?> businessException(BusinessException e) {
+        log.info("business exception! the reason is:{} " , e.getMessage());
+        return ApiResult.fail( e.getErrorCode() , e.getErrorMsg() );
+    }
+
+    /**
      * 拦截所有其他的异常
      */
     @ExceptionHandler(value = Throwable.class)
     public ApiResult<?> throwable(Throwable e) {
-        log.error("system exception! the reason is:{} " , e.getMessage());
+        log.error("system exception! the reason is:{} " , e.getMessage() , e);
         return ApiResult.fail( CommonErrorEnum.SYSTEM_ERROR );
     }
+
+
 
 }

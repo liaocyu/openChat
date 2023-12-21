@@ -32,4 +32,31 @@ public class UserBackpackDao extends ServiceImpl<UserBackpackMapper, UserBackpac
                 .eq(UserBackpack::getStatus, YesOrNoEnum.NO.getStatus())
                 .count();
     }
+
+    /**
+     * 判断用户改名卡是否可用
+     * @param uid
+     * @param itemId
+     */
+    public UserBackpack getFirstValidItem(Long uid, Long itemId) {
+        return lambdaQuery()
+                .eq(UserBackpack::getUid, uid)
+                .eq(UserBackpack::getItemId, itemId)
+                .eq(UserBackpack::getStatus, YesOrNoEnum.NO.getStatus())
+                .orderByAsc(UserBackpack::getId)
+                .last("limit 1")
+                .one();
+    }
+
+    /**
+     * 使用改名卡
+     * @param userBackpack
+     */
+    public boolean useItem(UserBackpack userBackpack) {
+        return lambdaUpdate()
+                .eq(UserBackpack::getId, userBackpack.getId())
+                .eq(UserBackpack::getStatus, YesOrNoEnum.NO.getStatus())
+                .set(UserBackpack::getStatus, YesOrNoEnum.YES.getStatus())
+                .update();
+    }
 }
