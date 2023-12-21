@@ -1,6 +1,7 @@
 package com.liaocyu.openChat.common.user.service;
 
 import com.liaocyu.openChat.common.user.domain.entity.User;
+import com.liaocyu.openChat.common.user.domain.vo.resp.UserInfoResp;
 
 /**
  * <p>
@@ -19,4 +20,18 @@ public interface UserService {
      * @return
      */
     Long register(User insert);
+
+    /**
+     * 获取用户个人信息
+     * @param uid
+     * @return
+     */
+    UserInfoResp getUserInfo(Long uid);
+
+    /**
+     * 用户修改用户名
+     * @param uid 用户Id
+     * @param name 用户修改的用户名
+     */
+    void modifyName(Long uid, String name);
 }
