@@ -1,7 +1,10 @@
 package com.liaocyu.openChat.common.user.service;
 
 import com.liaocyu.openChat.common.user.domain.entity.User;
+import com.liaocyu.openChat.common.user.domain.vo.resp.BadgeResp;
 import com.liaocyu.openChat.common.user.domain.vo.resp.UserInfoResp;
+
+import java.util.List;
 
 /**
  * <p>
@@ -34,4 +37,13 @@ public interface UserService {
      * @param name 用户修改的用户名
      */
     void modifyName(Long uid, String name);
+
+    List<BadgeResp> badges(Long uid);
+
+    /**
+     * 佩戴徽章
+     * @param uid 用户Id
+     * @param itemId 徽章Id
+     */
+    void wearingBadge(Long uid, Long itemId);
 }

@@ -5,6 +5,8 @@ import com.liaocyu.openChat.common.common.domain.vo.resp.ApiResult;
 import com.liaocyu.openChat.common.common.interceptor.TokenInterceptor;
 import com.liaocyu.openChat.common.common.utils.RequestHolder;
 import com.liaocyu.openChat.common.user.domain.vo.req.ModifyNameReq;
+import com.liaocyu.openChat.common.user.domain.vo.req.WearingBadgeReq;
+import com.liaocyu.openChat.common.user.domain.vo.resp.BadgeResp;
 import com.liaocyu.openChat.common.user.domain.vo.resp.UserInfoResp;
 import com.liaocyu.openChat.common.user.service.UserService;
 import io.swagger.annotations.Api;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Controller;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * <p>
@@ -34,7 +37,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/userInfo")
+    @GetMapping("userInfo")
     @ApiOperation("获取用户相关信息")
     public ApiResult<UserInfoResp> getUserInfo() {
 
@@ -48,6 +51,23 @@ public class UserController {
         userService.modifyName(RequestHolder.get().getUid() , req.getName());
         return ApiResult.success();
     }
+
+    @GetMapping("badges")
+    @ApiOperation("可选徽章预览")
+    public ApiResult<List<BadgeResp>> badges() {
+
+        return ApiResult.success(userService.badges(RequestHolder.get().getUid()));
+    }
+
+    @PutMapping("badge")
+    @ApiOperation("佩戴徽章")
+    public ApiResult<Void> wearingBadge(@Valid @RequestBody WearingBadgeReq req) {
+        userService.wearingBadge(RequestHolder.get().getUid() , req.getItemId());
+        return ApiResult.success();
+    }
+
+
+
 
 
 

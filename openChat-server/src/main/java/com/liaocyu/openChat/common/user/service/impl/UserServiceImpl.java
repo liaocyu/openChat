@@ -2,21 +2,28 @@ package com.liaocyu.openChat.common.user.service.impl;
 
 import com.liaocyu.openChat.common.common.exception.BusinessException;
 import com.liaocyu.openChat.common.common.utils.AssertUtil;
+import com.liaocyu.openChat.common.user.dao.ItemConfigDao;
 import com.liaocyu.openChat.common.user.dao.UserBackpackDao;
 import com.liaocyu.openChat.common.user.dao.UserDao;
+import com.liaocyu.openChat.common.user.domain.entity.ItemConfig;
 import com.liaocyu.openChat.common.user.domain.entity.User;
 import com.liaocyu.openChat.common.user.domain.entity.UserBackpack;
 import com.liaocyu.openChat.common.user.domain.enums.ItemEnum;
 import com.liaocyu.openChat.common.user.domain.enums.ItemTypeEnum;
+import com.liaocyu.openChat.common.user.domain.vo.resp.BadgeResp;
 import com.liaocyu.openChat.common.user.domain.vo.resp.UserInfoResp;
 import com.liaocyu.openChat.common.user.service.UserService;
 import com.liaocyu.openChat.common.user.service.adapter.UserAdapter;
+import com.liaocyu.openChat.common.user.service.cache.ItemCache;
 import org.aspectj.weaver.ast.Var;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * @author : create by lcy
@@ -31,6 +38,10 @@ public class UserServiceImpl implements UserService {
     UserDao userDao;
     @Autowired
     UserBackpackDao userBackpackDao;
+    @Autowired
+    ItemCache itemCache;
+    @Autowired
+    ItemConfigDao itemConfigDao;
 
     @Override
     @Transactional
@@ -61,5 +72,43 @@ public class UserServiceImpl implements UserService {
             // 改名
             userDao.modifyName(uid, name);
         }
+    }
+
+    @Override
+    public List<BadgeResp> badges(Long uid) {
+
+        // 获取所有徽章列表
+        /**
+         * 因为所有的徽章 不是经常可变的
+         * 因此使用的是本地缓存 ， 使用的是 Spring提供的 ，SpringCache ???
+         * 这里是从 caffeine 里面获取所有的徽章
+         */
+        List<ItemConfig> itemConfigs = itemCache.getByType(ItemTypeEnum.BADGE.getType());
+        // 查询用户拥有的徽章
+        List<UserBackpack> backpacks = userBackpackDao.getByItemIds(uid, itemConfigs.stream().map(ItemConfig::getId).collect(Collectors.toList()));
+        // 查询用户佩戴的徽章
+        User user = userDao.getById(uid);
+
+        return UserAdapter.buildBadgeResp(itemConfigs , backpacks , user);
+    }
+
+
+    /**
+     * 用户佩戴徽章Id
+     * @param uid 用户Id
+     * @param itemId 徽章Id
+     */
+    @Override
+    public void wearingBadge(Long uid, Long itemId) {
+        // 确保有徽章
+        UserBackpack firstvalidItem = userBackpackDao.getFirstValidItem(uid , itemId);
+        // 断言
+        AssertUtil.isNotEmpty(firstvalidItem , "您还没有这个徽章 , 请先获得");
+        // 因为用户背包表里面有改名卡和徽章 ，所以还需要判断这个ItemId 是否是徽章
+        ItemConfig itemConfig = itemConfigDao.getById(firstvalidItem.getId());
+        AssertUtil.equal(itemConfig.getType() , ItemTypeEnum.BADGE.getType(),"只有徽章才能佩戴");
+        // 佩戴徽章
+        userDao.wearingBadge(uid , itemId);
+        /*UserAdapter.buildWearingBadge(uid , itemId);*/
     }
 }
