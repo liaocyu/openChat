@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author : create by lcy
@@ -31,8 +30,7 @@ public class UserBackpackServiceImplTest {
 
     @Test
     public void acquireItem() {
-        userBackpackService.acquireItem(10443L , ItemEnum.PLANET.getId() , IdempotentEnum.UID , "10443");
-
+        userBackpackService.acquireItem(10443L , ItemEnum.REG_TOP100_BADGE.getId() , IdempotentEnum.UID , "10443");
     }
 
 
