@@ -1,5 +1,6 @@
 package com.liaocyu.openChat.common.user.service.impl;
 
+import com.liaocyu.openChat.common.common.annotation.RedissonLock;
 import com.liaocyu.openChat.common.common.domain.enums.YesOrNoEnum;
 import com.liaocyu.openChat.common.common.service.LockService;
 import com.liaocyu.openChat.common.common.utils.AssertUtil;
@@ -9,9 +10,11 @@ import com.liaocyu.openChat.common.user.domain.enums.IdempotentEnum;
 import com.liaocyu.openChat.common.user.service.IUserBackpackService;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
+import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.cache.CacheProperties;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -40,7 +43,7 @@ public class UserBackpackServiceImpl implements IUserBackpackService {
     }
 
     /**
-     * 最原始的获取物品逻辑
+     * 使用最原始的分布式锁来实现
      * @param uid 用户Id
      * @param itemId 物品Id
      * @param idempotentEnum 幂等类型
@@ -79,13 +82,13 @@ public class UserBackpackServiceImpl implements IUserBackpackService {
     }*/
 
     /**
-     * 升级改造后的物品逻辑
+     * 使用编程式实现分布式锁
      * @param uid 用户Id
      * @param itemId 物品Id
      * @param idempotentEnum 幂等类型
      * @param businessId 幂等唯一标识
      */
-    @Override
+    /*@Override
     public void acquireItem(Long uid, Long itemId, IdempotentEnum idempotentEnum, String businessId) {
         // 获取设置的幂等号
         String idempotent = getIdempotent(itemId, idempotentEnum, businessId);
@@ -105,6 +108,46 @@ public class UserBackpackServiceImpl implements IUserBackpackService {
             userBackpackDao.save(userBackpack1);
         });
 
+    }*/
+
+    /**
+     * 使用注解是实现分布式锁
+     * @param uid 用户Id
+     * @param itemId 物品Id
+     * @param idempotentEnum 幂等类型
+     * @param businessId 幂等唯一标识
+     */
+    @Override
+    public void acquireItem(Long uid , Long itemId , IdempotentEnum idempotentEnum , String businessId) {
+        String idempotent = getIdempotent(itemId, idempotentEnum, businessId);
+        /* 这里是同类调用 ， 在@Transactional标注的方法中，调用会失效的
+        *  这里的解决方法是自己调用自己 ，并使用 @Lazy 注解来解决循环依赖的问题
+        *       @Autowired
+        *       @Lazy
+        *       UserBackpackService userBackpackService
+        *
+        *  或者说 使用 AopContext.currentProxy() 来进行调用
+        *       ((UserBackpackServiceImpl) AopContext.currentProxy()).doAcquireItem(uid , itemId , idempotent);
+        * */
+         // 使用当前代理去调用这个方法
+        ((UserBackpackServiceImpl) AopContext.currentProxy()).doAcquireItem(uid , itemId , idempotent);
+    }
+
+    @Transactional
+    @RedissonLock(key = "#idempotent" , waitTime = 5000) // 等待 5 秒进行排队
+    public void doAcquireItem(Long uid, Long itemId, String idempotent) {
+        UserBackpack userBackpack = userBackpackDao.getByIdempotent(idempotent);
+        if(Objects.nonNull(userBackpack)) {
+            return;
+        }
+        // 发放物品
+        UserBackpack insert = UserBackpack.builder()
+                .uid(uid)
+                .itemId(itemId)
+                .status(YesOrNoEnum.NO.getStatus())
+                .idempotent(idempotent)
+                .build();
+        userBackpackDao.save(insert);
     }
 
     private String getIdempotent(Long itemId, IdempotentEnum idempotentEnum, String businessId) {

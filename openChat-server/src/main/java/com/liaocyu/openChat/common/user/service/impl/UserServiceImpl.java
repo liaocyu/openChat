@@ -1,5 +1,7 @@
 package com.liaocyu.openChat.common.user.service.impl;
 
+import com.liaocyu.openChat.common.common.annotation.RedissonLock;
+import com.liaocyu.openChat.common.common.event.UserRegisterEvent;
 import com.liaocyu.openChat.common.common.exception.BusinessException;
 import com.liaocyu.openChat.common.common.utils.AssertUtil;
 import com.liaocyu.openChat.common.user.dao.ItemConfigDao;
@@ -17,6 +19,7 @@ import com.liaocyu.openChat.common.user.service.adapter.UserAdapter;
 import com.liaocyu.openChat.common.user.service.cache.ItemCache;
 import org.aspectj.weaver.ast.Var;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,12 +45,16 @@ public class UserServiceImpl implements UserService {
     ItemCache itemCache;
     @Autowired
     ItemConfigDao itemConfigDao;
+    @Autowired
+    ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     @Transactional
     public Long register(User insert) {
         userDao.save(insert);
-        // TODO 用户注册的事件
+        // 发送物品
+        // 发布用户注册的事件
+        applicationEventPublisher.publishEvent(new UserRegisterEvent(this , insert));
         return insert.getId();
     }
 
@@ -61,6 +68,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @RedissonLock(key = "#uid")
     public void modifyName(Long uid, String name) {
         User oldUser = userDao.getByName(name);
         AssertUtil.isEmpty(oldUser , "名字已经被占用了，请重新换个名字");
