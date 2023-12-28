@@ -19,6 +19,8 @@ import io.netty.util.AttributeKey;
 public class NettyUtil {
     // 用于标识在 Channel 的属性中存储用户 token 的键
     public static AttributeKey<String> TOKEN = AttributeKey.valueOf("token");
+    // 标识channel属性中用户的 ip 的键
+    public static AttributeKey<String> IP = AttributeKey.valueOf("ip");
 
     public static <T> void setAttr(Channel channel , AttributeKey<T> key , T value) {
         Attribute<T> attr = channel.attr(key); // 获取 Attribute 对象

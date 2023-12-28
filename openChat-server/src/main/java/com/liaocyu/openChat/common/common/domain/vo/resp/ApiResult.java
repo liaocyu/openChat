@@ -1,5 +1,6 @@
 package com.liaocyu.openChat.common.common.domain.vo.resp;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.liaocyu.openChat.common.common.exception.ErrorEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -11,6 +12,7 @@ import lombok.Data;
  */
 @Data
 @ApiModel("基础返回体")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ApiResult<T> {
     @ApiModelProperty("成功标识true or false")
     private Boolean success;

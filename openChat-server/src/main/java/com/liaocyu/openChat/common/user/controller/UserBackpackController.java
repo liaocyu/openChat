@@ -4,6 +4,7 @@ package com.liaocyu.openChat.common.user.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * <p>
@@ -13,7 +14,7 @@ import org.springframework.stereotype.Controller;
  * @author <a href="https://github.com/liaocyu">liaocyu</a>
  * @since 2023-12-18
  */
-@Controller
+@RestController
 @RequestMapping("/userBackpack")
 public class UserBackpackController {
 

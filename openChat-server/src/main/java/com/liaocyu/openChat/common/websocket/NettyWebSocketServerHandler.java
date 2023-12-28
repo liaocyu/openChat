@@ -73,6 +73,18 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Tex
     }
 
     /**
+     * 处理 webSocket 抛出的异常
+     * @param ctx
+     * @param cause
+     * @throws Exception
+     */
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        log.error("exceptionCaught" , cause);
+        super.exceptionCaught(ctx, cause);
+    }
+
+    /**
      * 用户下线操作
      * 从ONLINE_MAP中移除用户的map 、关闭 channel
      * @param channel

@@ -4,7 +4,9 @@ import cn.hutool.core.util.RandomUtil;
 import cn.hutool.json.JSONUtil;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.liaocyu.openChat.common.common.event.UserOnlineEvent;
 import com.liaocyu.openChat.common.user.dao.UserDao;
+import com.liaocyu.openChat.common.user.domain.entity.IpInfo;
 import com.liaocyu.openChat.common.user.domain.entity.User;
 import com.liaocyu.openChat.common.user.service.LoginService;
 import com.liaocyu.openChat.common.websocket.domian.dto.WSChannelExtraDTO;
@@ -13,16 +15,20 @@ import com.liaocyu.openChat.common.websocket.domian.vo.resp.WSBaseResp;
 import com.liaocyu.openChat.common.websocket.domian.vo.resp.ws.WSLoginUrl;
 import com.liaocyu.openChat.common.websocket.service.WebSocketService;
 import com.liaocyu.openChat.common.websocket.service.adapter.WebSocketAdapter;
+import com.liaocyu.openChat.common.websocket.utils.NettyUtil;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.result.WxMpQrCodeTicket;
+import org.apache.catalina.core.ApplicationPushBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.util.Date;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -47,6 +53,9 @@ public class WebSocketServiceImpl implements WebSocketService {
 
     @Autowired
     LoginService loginService;
+
+    @Autowired
+    ApplicationEventPublisher applicationEventPublisher;
     /**
      * 管理所有用户的连接（登录态|游客）
      * WSChannelExtraDTO 服务层 用户中间信息
@@ -155,6 +164,11 @@ public class WebSocketServiceImpl implements WebSocketService {
         wsChannelExtraDTO.setUid(user.getId());
         // 2、推送成功消息
         sendMsg(channel , WebSocketAdapter.buildResp(user , token));
+        // 用户上线成功的事件
+        user.setLastOptTime(new Date());
+        user.refreshIp(NettyUtil.getAttr(channel , NettyUtil.IP));
+
+        applicationEventPublisher.publishEvent(new UserOnlineEvent(this , user));
     }
 
     // 用户发送消息逻辑

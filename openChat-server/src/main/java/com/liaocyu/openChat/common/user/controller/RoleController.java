@@ -8,15 +8,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * <p>
- * 功能物品配置表 前端控制器
+ * 角色表 前端控制器
  * </p>
  *
  * @author <a href="https://github.com/liaocyu">liaocyu</a>
- * @since 2023-12-18
+ * @since 2023-12-28
  */
 @RestController
-@RequestMapping("/itemConfig")
-public class ItemConfigController {
+@RequestMapping("/role")
+public class RoleController {
 
 }
 
