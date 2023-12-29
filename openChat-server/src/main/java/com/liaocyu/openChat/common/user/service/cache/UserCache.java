@@ -1,12 +1,18 @@
 package com.liaocyu.openChat.common.user.service.cache;
 
+import com.liaocyu.openChat.common.user.dao.BlackDao;
 import com.liaocyu.openChat.common.user.dao.UserRoleDao;
+import com.liaocyu.openChat.common.user.domain.entity.Black;
 import com.liaocyu.openChat.common.user.domain.entity.UserRole;
+import org.apache.commons.collections.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -20,21 +26,44 @@ import java.util.stream.Collectors;
 public class UserCache {
 
     private final UserRoleDao userRoleDao;
+    private final BlackDao blackDao;
 
     @Autowired
-    public UserCache(UserRoleDao userRoleDao) {
+    public UserCache(UserRoleDao userRoleDao , BlackDao blackDao
+    ) {
         this.userRoleDao = userRoleDao;
+        this.blackDao = blackDao;
     }
 
     /**
      * 获取指定用户的权限列表
+     *
      * @param uid 指定用户
      */
-    @Cacheable(cacheNames = "user" , key = " 'role:'+#uid")
+    @Cacheable(cacheNames = "user", key = " 'role:'+#uid")
     public Set<Long> getRoleSet(Long uid) {
         List<UserRole> userRoles = userRoleDao.listByUid(uid);
         return userRoles.stream()
                 .map(UserRole::getRoleId)
                 .collect(Collectors.toSet());
+    }
+
+    /**
+     * 获取用户拉黑列表
+     * 最后将结果保存到缓存中去
+     */
+    @Cacheable(cacheNames = "user" , key = "'blacklist'")
+    public Map<Integer, Set<String>> getBlackMap() {
+        Map<Integer, List<Black>> collect = blackDao.list().stream().collect(Collectors.groupingBy(Black::getType));
+        Map<Integer, Set<String>> result = new HashMap<>();
+        collect.forEach((type , list) -> {
+            result.put(type , list.stream().map(Black::getTarget).collect(Collectors.toSet()));
+        });
+        return result;
+    }
+
+    @CacheEvict(cacheNames = "user" , key = "'blackList'")
+    public Map<Integer , Set<String>> evictBlackMap() {
+        return null;
     }
 }

@@ -7,6 +7,7 @@ import com.liaocyu.openChat.common.user.dao.UserDao;
 import com.liaocyu.openChat.common.user.domain.entity.User;
 import com.liaocyu.openChat.common.user.domain.enums.UserActiveStatusEnum;
 import com.liaocyu.openChat.common.user.service.IpService;
+import com.liaocyu.openChat.common.user.service.cache.UserCache;
 import com.liaocyu.openChat.common.websocket.service.WebSocketService;
 import com.liaocyu.openChat.common.websocket.service.adapter.WebSocketAdapter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,11 +30,13 @@ public class UserBlackListener {
 
     private final WebSocketService webSocketService;
     private final UserDao userDao;
+    private final UserCache userCache;
 
     @Autowired
-    public UserBlackListener(WebSocketService webSocketService , UserDao userDao) {
+    public UserBlackListener(WebSocketService webSocketService , UserDao userDao , UserCache userCache) {
         this.webSocketService = webSocketService;
         this.userDao = userDao;
+        this.userCache = userCache;
     }
 
     /**
@@ -53,6 +56,12 @@ public class UserBlackListener {
     @TransactionalEventListener(classes = UserBlackEvent.class , phase = TransactionPhase.AFTER_COMMIT , fallbackExecution = true)
     public void changeUserStatus(UserBlackEvent event) {
         userDao.invalidUid(event.getUser().getId());
+    }
+
+    @Async
+    @TransactionalEventListener(classes = UserBlackEvent.class , phase = TransactionPhase.AFTER_COMMIT , fallbackExecution = true)
+    public void evictCache(UserBlackEvent event) {
+        userCache.evictBlackMap();
     }
 
 

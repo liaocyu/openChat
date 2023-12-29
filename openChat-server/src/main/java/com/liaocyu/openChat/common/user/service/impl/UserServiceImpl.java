@@ -60,7 +60,7 @@ public class UserServiceImpl implements UserService {
         userDao.save(insert);
         // 发送物品
         // 发布用户注册的事件
-        applicationEventPublisher.publishEvent(new UserRegisterEvent(this , insert));
+        applicationEventPublisher.publishEvent(new UserRegisterEvent(this, insert));
         return insert.getId();
     }
 
@@ -77,9 +77,9 @@ public class UserServiceImpl implements UserService {
     @RedissonLock(key = "#uid")
     public void modifyName(Long uid, String name) {
         User oldUser = userDao.getByName(name);
-        AssertUtil.isEmpty(oldUser , "名字已经被占用了，请重新换个名字");
+        AssertUtil.isEmpty(oldUser, "名字已经被占用了，请重新换个名字");
         UserBackpack userBackpack = userBackpackDao.getFirstValidItem(uid, ItemEnum.MODIFY_NAME_CARD.getId());
-        AssertUtil.isNotEmpty(userBackpack , "你已经改过名字啦~");
+        AssertUtil.isNotEmpty(userBackpack, "你已经改过名字啦~");
         // 使用改名卡
         boolean success = userBackpackDao.useItem(userBackpack);
         if (success) {
@@ -103,31 +103,33 @@ public class UserServiceImpl implements UserService {
         // 查询用户佩戴的徽章
         User user = userDao.getById(uid);
 
-        return UserAdapter.buildBadgeResp(itemConfigs , backpacks , user);
+        return UserAdapter.buildBadgeResp(itemConfigs, backpacks, user);
     }
 
 
     /**
      * 用户佩戴徽章Id
-     * @param uid 用户Id
+     *
+     * @param uid    用户Id
      * @param itemId 徽章Id
      */
     @Override
     public void wearingBadge(Long uid, Long itemId) {
         // 确保有徽章
-        UserBackpack firstvalidItem = userBackpackDao.getFirstValidItem(uid , itemId);
+        UserBackpack firstvalidItem = userBackpackDao.getFirstValidItem(uid, itemId);
         // 断言
-        AssertUtil.isNotEmpty(firstvalidItem , "您还没有这个徽章 , 请先获得");
+        AssertUtil.isNotEmpty(firstvalidItem, "您还没有这个徽章 , 请先获得");
         // 因为用户背包表里面有改名卡和徽章 ，所以还需要判断这个ItemId 是否是徽章
         ItemConfig itemConfig = itemConfigDao.getById(firstvalidItem.getId());
-        AssertUtil.equal(itemConfig.getType() , ItemTypeEnum.BADGE.getType(),"只有徽章才能佩戴");
+        AssertUtil.equal(itemConfig.getType(), ItemTypeEnum.BADGE.getType(), "只有徽章才能佩戴");
         // 佩戴徽章
-        userDao.wearingBadge(uid , itemId);
+        userDao.wearingBadge(uid, itemId);
         /*UserAdapter.buildWearingBadge(uid , itemId);*/
     }
 
     /**
      * 拉黑用户
+     *
      * @param req 用户相应的请求
      */
     @Override
@@ -143,17 +145,21 @@ public class UserServiceImpl implements UserService {
         User blackUser = userDao.getById(uid);
         balckIP(Optional.ofNullable(blackUser.getIpInfo()).map(IpInfo::getCreateIp).orElse(null));
         balckIP(Optional.ofNullable(blackUser.getIpInfo()).map(IpInfo::getUpdateIp).orElse(null));
-        applicationEventPublisher.publishEvent(new UserBlackEvent(this , blackUser));
+        applicationEventPublisher.publishEvent(new UserBlackEvent(this, blackUser));
     }
 
     // 封禁相应用户的IP
     private void balckIP(String ip) {
-        if(StringUtils.isBlank(ip)) {
+        if (StringUtils.isBlank(ip)) {
             return;
         }
-        Black insert = new Black();
-        insert.setType(BlackTypeEnum.IP.getType());
-        insert.setTarget(ip);
-        blackDao.save(insert);
+        try {
+            Black insert = new Black();
+            insert.setType(BlackTypeEnum.IP.getType());
+            insert.setTarget(ip);
+            blackDao.save(insert);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
