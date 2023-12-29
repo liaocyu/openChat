@@ -1,22 +1,25 @@
 package com.liaocyu.openChat.common.user.service.impl;
 
 import com.liaocyu.openChat.common.common.annotation.RedissonLock;
+import com.liaocyu.openChat.common.common.event.UserBlackEvent;
 import com.liaocyu.openChat.common.common.event.UserRegisterEvent;
 import com.liaocyu.openChat.common.common.exception.BusinessException;
 import com.liaocyu.openChat.common.common.utils.AssertUtil;
+import com.liaocyu.openChat.common.user.dao.BlackDao;
 import com.liaocyu.openChat.common.user.dao.ItemConfigDao;
 import com.liaocyu.openChat.common.user.dao.UserBackpackDao;
 import com.liaocyu.openChat.common.user.dao.UserDao;
-import com.liaocyu.openChat.common.user.domain.entity.ItemConfig;
-import com.liaocyu.openChat.common.user.domain.entity.User;
-import com.liaocyu.openChat.common.user.domain.entity.UserBackpack;
+import com.liaocyu.openChat.common.user.domain.entity.*;
+import com.liaocyu.openChat.common.user.domain.enums.BlackTypeEnum;
 import com.liaocyu.openChat.common.user.domain.enums.ItemEnum;
 import com.liaocyu.openChat.common.user.domain.enums.ItemTypeEnum;
+import com.liaocyu.openChat.common.user.domain.vo.req.BlackUserReq;
 import com.liaocyu.openChat.common.user.domain.vo.resp.BadgeResp;
 import com.liaocyu.openChat.common.user.domain.vo.resp.UserInfoResp;
 import com.liaocyu.openChat.common.user.service.UserService;
 import com.liaocyu.openChat.common.user.service.adapter.UserAdapter;
 import com.liaocyu.openChat.common.user.service.cache.ItemCache;
+import org.apache.commons.lang3.StringUtils;
 import org.aspectj.weaver.ast.Var;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -26,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -47,6 +51,8 @@ public class UserServiceImpl implements UserService {
     ItemConfigDao itemConfigDao;
     @Autowired
     ApplicationEventPublisher applicationEventPublisher;
+    @Autowired
+    BlackDao blackDao;
 
     @Override
     @Transactional
@@ -118,5 +124,36 @@ public class UserServiceImpl implements UserService {
         // 佩戴徽章
         userDao.wearingBadge(uid , itemId);
         /*UserAdapter.buildWearingBadge(uid , itemId);*/
+    }
+
+    /**
+     * 拉黑用户
+     * @param req 用户相应的请求
+     */
+    @Override
+    @Transactional
+    public void black(BlackUserReq req) {
+        // 获取请求里面的用户信息
+        Long uid = req.getUid();
+        Black user = new Black();
+        user.setType(BlackTypeEnum.UID.getType());
+        user.setTarget(uid.toString());
+        blackDao.save(user);
+        // 获取当前用户 封掉该用户的创建时候的createIp 和 updateIp
+        User blackUser = userDao.getById(uid);
+        balckIP(Optional.ofNullable(blackUser.getIpInfo()).map(IpInfo::getCreateIp).orElse(null));
+        balckIP(Optional.ofNullable(blackUser.getIpInfo()).map(IpInfo::getUpdateIp).orElse(null));
+        applicationEventPublisher.publishEvent(new UserBlackEvent(this , blackUser));
+    }
+
+    // 封禁相应用户的IP
+    private void balckIP(String ip) {
+        if(StringUtils.isBlank(ip)) {
+            return;
+        }
+        Black insert = new Black();
+        insert.setType(BlackTypeEnum.IP.getType());
+        insert.setTarget(ip);
+        blackDao.save(insert);
     }
 }

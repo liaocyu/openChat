@@ -1,13 +1,18 @@
 package com.liaocyu.openChat.common.user.controller;
 
 
+import com.liaocyu.openChat.common.common.domain.dto.RequestInfo;
 import com.liaocyu.openChat.common.common.domain.vo.resp.ApiResult;
 import com.liaocyu.openChat.common.common.interceptor.TokenInterceptor;
+import com.liaocyu.openChat.common.common.utils.AssertUtil;
 import com.liaocyu.openChat.common.common.utils.RequestHolder;
+import com.liaocyu.openChat.common.user.domain.enums.RoleEnum;
+import com.liaocyu.openChat.common.user.domain.vo.req.BlackUserReq;
 import com.liaocyu.openChat.common.user.domain.vo.req.ModifyNameReq;
 import com.liaocyu.openChat.common.user.domain.vo.req.WearingBadgeReq;
 import com.liaocyu.openChat.common.user.domain.vo.resp.BadgeResp;
 import com.liaocyu.openChat.common.user.domain.vo.resp.UserInfoResp;
+import com.liaocyu.openChat.common.user.service.IRoleService;
 import com.liaocyu.openChat.common.user.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModel;
@@ -37,6 +42,9 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private IRoleService roleService;
+
     @GetMapping("userInfo")
     @ApiOperation("获取用户相关信息")
     public ApiResult<UserInfoResp> getUserInfo() {
@@ -48,7 +56,7 @@ public class UserController {
     @ApiOperation("修改用户名")
     public ApiResult<Void> modifyName(@RequestBody @Valid ModifyNameReq req) {
 
-        userService.modifyName(RequestHolder.get().getUid() , req.getName());
+        userService.modifyName(RequestHolder.get().getUid(), req.getName());
         return ApiResult.success();
     }
 
@@ -62,15 +70,25 @@ public class UserController {
     @PutMapping("badge")
     @ApiOperation("佩戴徽章")
     public ApiResult<Void> wearingBadge(@Valid @RequestBody WearingBadgeReq req) {
-        userService.wearingBadge(RequestHolder.get().getUid() , req.getItemId());
+        userService.wearingBadge(RequestHolder.get().getUid(), req.getItemId());
         return ApiResult.success();
     }
 
-
-
-
-
-
+    /**
+     * 拉黑用户
+     * @param req 前端请求
+     * @return
+     */
+    @PutMapping("black")
+    @ApiOperation("拉黑用户")
+    public ApiResult<Void> black(@Valid @RequestBody BlackUserReq req) {
+        // 判断当前用户是否有管理员权限
+        Long uid = RequestHolder.get().getUid();
+        boolean hasPower = roleService.hasPower(uid, RoleEnum.ADMIN);
+        AssertUtil.isTrue(hasPower , "没有权限");
+        userService.black(req);
+        return ApiResult.success();
+    }
 
 
 }

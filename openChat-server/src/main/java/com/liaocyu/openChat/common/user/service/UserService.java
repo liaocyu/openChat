@@ -1,6 +1,7 @@
 package com.liaocyu.openChat.common.user.service;
 
 import com.liaocyu.openChat.common.user.domain.entity.User;
+import com.liaocyu.openChat.common.user.domain.vo.req.BlackUserReq;
 import com.liaocyu.openChat.common.user.domain.vo.resp.BadgeResp;
 import com.liaocyu.openChat.common.user.domain.vo.resp.UserInfoResp;
 
@@ -46,4 +47,11 @@ public interface UserService {
      * @param itemId 徽章Id
      */
     void wearingBadge(Long uid, Long itemId);
+
+    /**
+     * 拉黑用户
+     *
+     * @param req 用户相应的请求
+     */
+    void black(BlackUserReq req);
 }

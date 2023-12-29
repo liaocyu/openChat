@@ -48,4 +48,20 @@ public class ThreadPoolConfig implements AsyncConfigurer {
         executor.initialize();
         return executor;
     }
+
+    @Bean(WS_EXECUTOR)
+    @Primary
+    public ThreadPoolTaskExecutor webSocketExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setWaitForTasksToCompleteOnShutdown(true);
+        executor.setCorePoolSize(16);
+        executor.setMaxPoolSize(16);
+        executor.setQueueCapacity(1000);
+        executor.setThreadNamePrefix("webSocket-executor-"); // 设置线程前缀 排查 cpu占用问题
+        // 对于 WebSocket 的连接 如果真的推送不过去 就直接扔掉这个任务
+        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy());
+        executor.setThreadFactory(new MyThreadFactory(executor)); // 指定线程池的线程工厂
+        executor.initialize();
+        return executor;
+    }
 }

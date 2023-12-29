@@ -1,5 +1,6 @@
 package com.liaocyu.openChat.common.websocket.service;
 
+import com.liaocyu.openChat.common.websocket.domian.vo.resp.WSBaseResp;
 import io.netty.channel.Channel;
 
 /**
@@ -35,4 +36,6 @@ public interface WebSocketService {
      * @param token 用户传入的 toekn
      */
     void authorize(Channel channel, String token);
+
+    void sendMsgToAll(WSBaseResp<?> msg);
 }

@@ -8,6 +8,9 @@ import com.liaocyu.openChat.common.common.event.UserOnlineEvent;
 import com.liaocyu.openChat.common.user.dao.UserDao;
 import com.liaocyu.openChat.common.user.domain.entity.IpInfo;
 import com.liaocyu.openChat.common.user.domain.entity.User;
+import com.liaocyu.openChat.common.user.domain.enums.RoleEnum;
+import com.liaocyu.openChat.common.user.service.IRoleService;
+import com.liaocyu.openChat.common.user.service.IUserRoleService;
 import com.liaocyu.openChat.common.user.service.LoginService;
 import com.liaocyu.openChat.common.websocket.domian.dto.WSChannelExtraDTO;
 import com.liaocyu.openChat.common.websocket.domian.enums.WSRespTypeEnum;
@@ -23,8 +26,10 @@ import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.result.WxMpQrCodeTicket;
 import org.apache.catalina.core.ApplicationPushBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -39,7 +44,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @description :
  * 处理用户的登录逻辑、发送消息的逻辑
  * 使用了两个 Map；使用 caffeine 来关联登录码code和channel
- *               使用 ConcurrentHashMap 来关联 channel 和 WSChannelExtraDTO 实体类对象
+ * 使用 ConcurrentHashMap 来关联 channel 和 WSChannelExtraDTO 实体类对象
  */
 @Service
 public class WebSocketServiceImpl implements WebSocketService {
@@ -56,11 +61,20 @@ public class WebSocketServiceImpl implements WebSocketService {
 
     @Autowired
     ApplicationEventPublisher applicationEventPublisher;
+
+    @Autowired
+    IRoleService roleService;
+
+    // 注入 webSocketExecutor 线程池配置
+    @Qualifier("websocketExecutor")
+    @Autowired
+    ThreadPoolTaskExecutor threadPoolTaskExecutor;
+
     /**
      * 管理所有用户的连接（登录态|游客）
      * WSChannelExtraDTO 服务层 用户中间信息
      */
-    private static final ConcurrentHashMap<Channel , WSChannelExtraDTO> ONLINE_WS_MAP = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<Channel, WSChannelExtraDTO> ONLINE_WS_MAP = new ConcurrentHashMap<>();
 
     /**
      * 临时保存登录code和channel的映射关系
@@ -68,20 +82,21 @@ public class WebSocketServiceImpl implements WebSocketService {
      */
     public static final int MAXIMUM_SIZE = 1000;
     public static final Duration DURATION = Duration.ofHours(1);
-    private static final Cache<Integer , Channel> WAIT_LOGIN_MAP = Caffeine.newBuilder()
+    private static final Cache<Integer, Channel> WAIT_LOGIN_MAP = Caffeine.newBuilder()
             .maximumSize(MAXIMUM_SIZE)
             .expireAfterWrite(DURATION)
             .build();
 
     @Override
     public void connect(Channel channel) {
-        ONLINE_WS_MAP.put(channel , new WSChannelExtraDTO());
+        ONLINE_WS_MAP.put(channel, new WSChannelExtraDTO());
     }
 
     /**
      * 处理用户的首次登录请求
      * 前端点击登录 会发出一个请求登录二维码的 webSocket 信息
      * 使用 caffeine ，将code 为键 ，channel 为值 保存用户的 channel
+     *
      * @param channel
      */
     @Override
@@ -98,7 +113,7 @@ public class WebSocketServiceImpl implements WebSocketService {
             throw new RuntimeException(e);
         }
         // 3、把码推给前端
-        sendMsg(channel , WebSocketAdapter.buildResp(wxMpQrCodeTicket));
+        sendMsg(channel, WebSocketAdapter.buildResp(wxMpQrCodeTicket));
     }
 
     @Override
@@ -111,7 +126,7 @@ public class WebSocketServiceImpl implements WebSocketService {
     public void scanLoginSuccess(Integer code, Long id) {
         // 确认连接在机器上
         Channel channel = WAIT_LOGIN_MAP.getIfPresent(code);
-        if(Objects.isNull(channel)) {
+        if (Objects.isNull(channel)) {
             return;
         }
         User user = userDao.getById(id);
@@ -121,16 +136,16 @@ public class WebSocketServiceImpl implements WebSocketService {
         String token = loginService.login(id);
         // 用户登录
         // sendMsg(channel , WebSocketAdapter.buildResp(user , token));
-        loginSuccess(channel , user , token);
+        loginSuccess(channel, user, token);
     }
 
     @Override
     public void waitAuthorize(Integer code) {
         Channel channel = WAIT_LOGIN_MAP.getIfPresent(code);
-        if(Objects.isNull(channel)) {
-            return ;
+        if (Objects.isNull(channel)) {
+            return;
         }
-        sendMsg(channel , WebSocketAdapter.buildwaitAuthorize());
+        sendMsg(channel, WebSocketAdapter.buildwaitAuthorize());
     }
 
     // 用户token 认证
@@ -141,20 +156,32 @@ public class WebSocketServiceImpl implements WebSocketService {
         if (Objects.nonNull(channel)) {
             // 登录成功 获取用户相关信息
             User user = userDao.getById(validUid);
-            loginSuccess(channel , user , token);
+            loginSuccess(channel, user, token);
             // 给前端返回登录成功通知
-/*            sendMsg(channel , WebSocketAdapter.buildResp(user , token));*/
+            /*            sendMsg(channel , WebSocketAdapter.buildResp(user , token));*/
         } else {
             // 如果token 不存在，给前端通知清除token ，重新登录
-            sendMsg(channel,WebSocketAdapter.buildInvalidToeknResp());
+            sendMsg(channel, WebSocketAdapter.buildInvalidToeknResp());
         }
     }
 
     /**
+     * 发送消息给所有在线用户
      *
+     * @param msg
+     */
+    @Override
+    public void sendMsgToAll(WSBaseResp<?> msg) {
+        // 获取所有连接的用户
+        ONLINE_WS_MAP.forEach((channel, ext) -> {
+            threadPoolTaskExecutor.execute(() -> sendMsg(channel, msg));
+        });
+    }
+
+    /**
      * @param channel websocket 连接
-     * @param user 当前登录用户
-     * @param token 用户token
+     * @param user    当前登录用户
+     * @param token   用户token
      */
     private void loginSuccess(Channel channel, User user, String token) {
 
@@ -163,12 +190,13 @@ public class WebSocketServiceImpl implements WebSocketService {
         WSChannelExtraDTO wsChannelExtraDTO = ONLINE_WS_MAP.get(channel);
         wsChannelExtraDTO.setUid(user.getId());
         // 2、推送成功消息
-        sendMsg(channel , WebSocketAdapter.buildResp(user , token));
+        // 判断用户是否有权限
+        sendMsg(channel, WebSocketAdapter.buildResp(user, token, roleService.hasPower(user.getId(), RoleEnum.CHAT_MANAGER)));
         // 用户上线成功的事件
         user.setLastOptTime(new Date());
-        user.refreshIp(NettyUtil.getAttr(channel , NettyUtil.IP));
+        user.refreshIp(NettyUtil.getAttr(channel, NettyUtil.IP));
 
-        applicationEventPublisher.publishEvent(new UserOnlineEvent(this , user));
+        applicationEventPublisher.publishEvent(new UserOnlineEvent(this, user));
     }
 
     // 用户发送消息逻辑
@@ -178,11 +206,11 @@ public class WebSocketServiceImpl implements WebSocketService {
 
     // 生成唯一的 code 值 ， 并将这个 code和channel关联起来
     private Integer generateLoginCode(Channel channel) {
-        Integer code ;
+        Integer code;
         do {
             code = RandomUtil.randomInt(Integer.MAX_VALUE);
             // WAIT_LOGIN_MAP.asMap() 转为 普通的 map ，putIfAbsent 插入成功返回null ,不成功返回 存在的值
-        } while (Objects.nonNull(WAIT_LOGIN_MAP.asMap().putIfAbsent(code , channel)));
-        return code ;
+        } while (Objects.nonNull(WAIT_LOGIN_MAP.asMap().putIfAbsent(code, channel)));
+        return code;
     }
 }
