@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 /**
  * @author : create by lcy
@@ -16,7 +17,7 @@ import javax.validation.constraints.NotBlank;
 public class BlackUserReq {
 
     @ApiModelProperty("拉黑用户")
-    @NotBlank
+    @NotNull
     private Long uid;
 
 

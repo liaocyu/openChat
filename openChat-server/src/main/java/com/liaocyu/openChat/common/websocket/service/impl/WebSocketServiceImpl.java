@@ -35,6 +35,7 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.util.Date;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -172,7 +173,7 @@ public class WebSocketServiceImpl implements WebSocketService {
      */
     @Override
     public void sendMsgToAll(WSBaseResp<?> msg) {
-        // 获取所有连接的用户
+        // 获取所有连接的用户 并将消息进行批量推送
         ONLINE_WS_MAP.forEach((channel, ext) -> {
             threadPoolTaskExecutor.execute(() -> sendMsg(channel, msg));
         });
@@ -188,7 +189,7 @@ public class WebSocketServiceImpl implements WebSocketService {
         // 用户上线成功
         // 1、保存channel的对应的 uid
         WSChannelExtraDTO wsChannelExtraDTO = ONLINE_WS_MAP.get(channel);
-        wsChannelExtraDTO.setUid(user.getId());
+        wsChannelExtraDTO.setUid(/*user.getId()*/Optional.ofNullable(user).map(User::getId).orElse(null));
         // 2、推送成功消息
         // 判断用户是否有权限
         sendMsg(channel, WebSocketAdapter.buildResp(user, token, roleService.hasPower(user.getId(), RoleEnum.CHAT_MANAGER)));

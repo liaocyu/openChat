@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
  * @since 2023-12-08
  */
 @Service
-public class UserDao extends ServiceImpl<UserMapper, User>{
+public class UserDao extends ServiceImpl<UserMapper, User> {
 
     public User getByOpenId(String openId) {
         return lambdaQuery()
@@ -29,22 +29,22 @@ public class UserDao extends ServiceImpl<UserMapper, User>{
 
     public void modifyName(Long uid, String name) {
         lambdaUpdate()
-                .eq(User::getId , uid)
-                .set(User::getName , name)
+                .eq(User::getId, uid)
+                .set(User::getName, name)
                 .update();
     }
 
     public void wearingBadge(Long uid, Long itemId) {
         lambdaUpdate()
-                .eq(User::getId , uid)
-                .set(User::getItemId , itemId)
+                .eq(User::getId, uid)
+                .set(User::getItemId, itemId)
                 .update();
     }
 
     public void invalidUid(Long id) {
         lambdaUpdate()
-                .eq(User::getId , id)
-                .set(User::getStatus , YesOrNoEnum.YES.getStatus())
+                .eq(User::getId, id)
+                .set(User::getStatus, YesOrNoEnum.YES.getStatus())
                 .update();
     }
 }

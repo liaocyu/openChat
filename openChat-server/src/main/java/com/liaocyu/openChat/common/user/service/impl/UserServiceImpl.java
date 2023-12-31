@@ -19,6 +19,7 @@ import com.liaocyu.openChat.common.user.domain.vo.resp.UserInfoResp;
 import com.liaocyu.openChat.common.user.service.UserService;
 import com.liaocyu.openChat.common.user.service.adapter.UserAdapter;
 import com.liaocyu.openChat.common.user.service.cache.ItemCache;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.weaver.ast.Var;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,7 @@ import java.util.stream.Collectors;
  * @description :
  */
 @Service
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     @Autowired
@@ -138,8 +140,8 @@ public class UserServiceImpl implements UserService {
         // 获取请求里面的用户信息
         Long uid = req.getUid();
         Black user = new Black();
-        user.setType(BlackTypeEnum.UID.getType());
         user.setTarget(uid.toString());
+        user.setType(BlackTypeEnum.UID.getType());
         blackDao.save(user);
         // 获取当前用户 封掉该用户的创建时候的createIp 和 updateIp
         User blackUser = userDao.getById(uid);
@@ -154,12 +156,12 @@ public class UserServiceImpl implements UserService {
             return;
         }
         try {
-            Black insert = new Black();
-            insert.setType(BlackTypeEnum.IP.getType());
-            insert.setTarget(ip);
-            blackDao.save(insert);
+            Black user = new Black();
+            user.setTarget(ip);
+            user.setType(BlackTypeEnum.IP.getType());
+            blackDao.save(user);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            log.error("duplicate black ip:{}", ip);
         }
     }
 }
