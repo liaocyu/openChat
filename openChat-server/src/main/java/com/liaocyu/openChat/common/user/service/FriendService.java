@@ -13,4 +13,12 @@ import com.liaocyu.openChat.common.user.domain.vo.resp.FriendResp;
 public interface FriendService {
 
     CursorPageBaseResp<FriendResp> friendList(Long uid, CursorPageBaseReq request);
+
+    /**
+     * 删除好友
+     *
+     * @param uid       uid
+     * @param friendUid 朋友uid
+     */
+    void deleteFriend(Long uid, Long friendUid);
 }
