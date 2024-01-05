@@ -2,6 +2,8 @@ package com.liaocyu.openChat.common.user.service;
 
 import com.liaocyu.openChat.common.common.domain.vo.req.CursorPageBaseReq;
 import com.liaocyu.openChat.common.common.domain.vo.resp.CursorPageBaseResp;
+import com.liaocyu.openChat.common.user.domain.vo.req.FriendCheckReq;
+import com.liaocyu.openChat.common.user.domain.vo.resp.FriendCheckResp;
 import com.liaocyu.openChat.common.user.domain.vo.resp.FriendResp;
 
 /**
@@ -21,4 +23,12 @@ public interface FriendService {
      * @param friendUid 朋友uid
      */
     void deleteFriend(Long uid, Long friendUid);
+
+    /**
+     * 检查是否是自己好友
+     * @param uid uid
+     * @param request 请求
+     * @return
+     */
+    FriendCheckResp check(Long uid, FriendCheckReq request);
 }

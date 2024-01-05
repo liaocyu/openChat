@@ -5,6 +5,8 @@ import com.liaocyu.openChat.common.common.domain.vo.req.CursorPageBaseReq;
 import com.liaocyu.openChat.common.common.domain.vo.resp.ApiResult;
 import com.liaocyu.openChat.common.common.domain.vo.resp.CursorPageBaseResp;
 import com.liaocyu.openChat.common.common.utils.RequestHolder;
+import com.liaocyu.openChat.common.user.domain.vo.req.FriendCheckReq;
+import com.liaocyu.openChat.common.user.domain.vo.resp.FriendCheckResp;
 import com.liaocyu.openChat.common.user.domain.vo.resp.FriendResp;
 import com.liaocyu.openChat.common.user.service.FriendService;
 import io.swagger.annotations.Api;
@@ -40,6 +42,13 @@ public class UserFriendController {
     @Autowired
     public UserFriendController(FriendService friendService) {
         this.friendService = friendService;
+    }
+
+    @GetMapping("check")
+    @ApiOperation("批量判断是否是自己好友")
+    public ApiResult<FriendCheckResp> check(@Valid FriendCheckReq request) {
+        Long uid = RequestHolder.get().getUid();
+        return ApiResult.success(friendService.check(uid , request));
     }
 
     @GetMapping("/page")

@@ -1,5 +1,8 @@
 package com.liaocyu.openChat.common.user.dao;
 
+import com.liaocyu.openChat.common.common.domain.vo.req.CursorPageBaseReq;
+import com.liaocyu.openChat.common.common.domain.vo.resp.CursorPageBaseResp;
+import com.liaocyu.openChat.common.common.utils.CursorUtils;
 import com.liaocyu.openChat.common.user.domain.entity.UserFriend;
 import com.liaocyu.openChat.common.user.mapper.UserFriendMapper;
 import com.liaocyu.openChat.common.user.service.IUserFriendService;
@@ -27,6 +30,18 @@ public class UserFriendDao extends ServiceImpl<UserFriendMapper, UserFriend> {
                 .eq(UserFriend::getFriendUid, uid)
                 .eq(UserFriend::getUid, friendUid)
                 .select(UserFriend::getId)
+                .list();
+    }
+
+    public CursorPageBaseResp<UserFriend> getFriendPage(Long uid, CursorPageBaseReq cursorPageBaseReq) {
+        return CursorUtils.getCursorPageByMysql(this , cursorPageBaseReq ,
+                wrapper -> wrapper.eq(UserFriend::getUid , uid) , UserFriend::getId);
+    }
+
+    public List<UserFriend> getByFriends(Long uid, List<Long> uidList) {
+        return lambdaQuery()
+                .eq(UserFriend::getUid , uid)
+                .in(UserFriend::getFriendUid,uidList)
                 .list();
     }
 }
