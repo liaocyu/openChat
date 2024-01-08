@@ -2,6 +2,7 @@ package com.liaocyu.openChat.common.user.service;
 
 import com.liaocyu.openChat.common.user.domain.entity.Room;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.liaocyu.openChat.common.user.domain.entity.RoomFriend;
 
 import java.util.List;
 
@@ -15,5 +16,16 @@ import java.util.List;
  */
 public interface IRoomService {
 
-    void disableFriendRoom(List<Long> asList);
+    /**
+     * 禁用一个单聊房间
+     * @param uidList
+     */
+    void disableFriendRoom(List<Long> uidList);
+
+    /**
+     * 创建一个单聊房间
+     * @param uidList uidList
+     * @return
+     */
+    RoomFriend createFriendRoom(List<Long> uidList);
 }

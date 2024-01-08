@@ -1,7 +1,7 @@
 package com.liaocyu.openChat.common.user.service;
 
 import com.liaocyu.openChat.common.user.domain.entity.User;
-import com.liaocyu.openChat.common.user.domain.vo.req.BlackUserReq;
+import com.liaocyu.openChat.common.user.domain.vo.req.user.BlackUserReq;
 import com.liaocyu.openChat.common.user.domain.vo.resp.BadgeResp;
 import com.liaocyu.openChat.common.user.domain.vo.resp.UserInfoResp;
 

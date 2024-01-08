@@ -1,4 +1,4 @@
-package com.liaocyu.openChat.common.user.domain.vo.req;
+package com.liaocyu.openChat.common.user.domain.vo.req.friend;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;

@@ -1,28 +1,22 @@
 package com.liaocyu.openChat.common.user.controller;
 
 
-import com.liaocyu.openChat.common.common.domain.dto.RequestInfo;
 import com.liaocyu.openChat.common.common.domain.vo.resp.ApiResult;
-import com.liaocyu.openChat.common.common.interceptor.TokenInterceptor;
 import com.liaocyu.openChat.common.common.utils.AssertUtil;
 import com.liaocyu.openChat.common.common.utils.RequestHolder;
 import com.liaocyu.openChat.common.user.domain.enums.RoleEnum;
-import com.liaocyu.openChat.common.user.domain.vo.req.BlackUserReq;
-import com.liaocyu.openChat.common.user.domain.vo.req.ModifyNameReq;
-import com.liaocyu.openChat.common.user.domain.vo.req.WearingBadgeReq;
+import com.liaocyu.openChat.common.user.domain.vo.req.user.BlackUserReq;
+import com.liaocyu.openChat.common.user.domain.vo.req.user.ModifyNameReq;
+import com.liaocyu.openChat.common.user.domain.vo.req.user.WearingBadgeReq;
 import com.liaocyu.openChat.common.user.domain.vo.resp.BadgeResp;
 import com.liaocyu.openChat.common.user.domain.vo.resp.UserInfoResp;
 import com.liaocyu.openChat.common.user.service.IRoleService;
 import com.liaocyu.openChat.common.user.service.UserService;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import org.springframework.stereotype.Controller;
-
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
 
