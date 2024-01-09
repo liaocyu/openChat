@@ -28,10 +28,10 @@ public class FriendAdapter {
         UserApply userApplyNew = new UserApply();
         userApplyNew.setUid(uid);
         userApplyNew.setMsg(request.getMsg());
-        userApplyNew.setType(ADD_FRIEND.getCode());
+        userApplyNew.setType(ADD_FRIEND.getCode()); // 申请类型 - 加好友
         userApplyNew.setTargetId(request.getTargetUid());
-        userApplyNew.setStatus(WAIT_APPROVAL.getCode());
-        userApplyNew.setReadStatus(UNREAD.getCode());
+        userApplyNew.setStatus(WAIT_APPROVAL.getCode()); // 申请状态 - 待审批
+        userApplyNew.setReadStatus(UNREAD.getCode()); // 审批状态 - 未读
         return userApplyNew;
     }
 

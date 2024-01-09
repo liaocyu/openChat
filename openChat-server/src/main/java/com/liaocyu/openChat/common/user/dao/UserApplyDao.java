@@ -3,6 +3,7 @@ package com.liaocyu.openChat.common.user.dao;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.liaocyu.openChat.common.user.domain.entity.UserApply;
+import com.liaocyu.openChat.common.user.domain.enums.ApplyStatusEnum;
 import com.liaocyu.openChat.common.user.domain.enums.ApplyTypeEnum;
 import com.liaocyu.openChat.common.user.mapper.UserApplyMapper;
 import com.liaocyu.openChat.common.user.service.IUserApplyService;
@@ -34,10 +35,10 @@ public class UserApplyDao extends ServiceImpl<UserApplyMapper, UserApply> {
      */
     public UserApply getFriendApproving(Long uid, Long targetUid) {
         return lambdaQuery()
-                .eq(UserApply::getUid, uid)
-                .eq(UserApply::getTargetId, targetUid)
-                .eq(UserApply::getStatus , ApplyTypeEnum.ADD_FRIEND)
-                .eq(UserApply::getType , ApplyTypeEnum.ADD_FRIEND.getCode())
+                .eq(UserApply::getUid, uid) // 申请人 Uid
+                .eq(UserApply::getTargetId, targetUid) // 接收人 Uid
+                .eq(UserApply::getStatus , ApplyStatusEnum.WAIT_APPROVAL) // 申请状态 - 待审批
+                .eq(UserApply::getType , ApplyTypeEnum.ADD_FRIEND.getCode()) // 申请状态码 - 加好友
                 .one();
     }
 

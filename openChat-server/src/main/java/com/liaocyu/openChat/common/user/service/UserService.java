@@ -1,7 +1,11 @@
 package com.liaocyu.openChat.common.user.service;
 
+import com.liaocyu.openChat.common.common.domain.dto.ItemInfoDTO;
+import com.liaocyu.openChat.common.common.domain.dto.SummeryInfoDTO;
 import com.liaocyu.openChat.common.user.domain.entity.User;
 import com.liaocyu.openChat.common.user.domain.vo.req.user.BlackUserReq;
+import com.liaocyu.openChat.common.user.domain.vo.req.user.ItemInfoReq;
+import com.liaocyu.openChat.common.user.domain.vo.req.user.SummeryInfoReq;
 import com.liaocyu.openChat.common.user.domain.vo.resp.BadgeResp;
 import com.liaocyu.openChat.common.user.domain.vo.resp.UserInfoResp;
 
@@ -54,4 +58,14 @@ public interface UserService {
      * @param req 用户相应的请求
      */
     void black(BlackUserReq req);
+
+    /**
+     * 获取用户的汇总信息
+     *
+     * @param req
+     * @return
+     */
+    List<SummeryInfoDTO> getSummeryUserInfo(SummeryInfoReq req);
+
+    List<ItemInfoDTO> getItemInfo(ItemInfoReq req);
 }

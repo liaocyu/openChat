@@ -1,5 +1,7 @@
 package com.liaocyu.openChat.common.user.service.cache;
 
+import com.liaocyu.openChat.common.common.constant.RedisKey;
+import com.liaocyu.openChat.common.common.utils.RedisUtils;
 import com.liaocyu.openChat.common.user.dao.BlackDao;
 import com.liaocyu.openChat.common.user.dao.UserRoleDao;
 import com.liaocyu.openChat.common.user.domain.entity.Black;
@@ -65,5 +67,15 @@ public class UserCache {
     @CacheEvict(cacheNames = "user" , key = "'blackList'")
     public Map<Integer , Set<String>> evictBlackMap() {
         return null;
+    }
+
+    /**
+     * 获取信息最后一次修改事件
+     * @param uidList
+     * @return
+     */
+    public List<Long> getUserModifyTime(List<Long> uidList) {
+        List<String> keys = uidList.stream().map(uid -> RedisKey.getKey(RedisKey.USER_MODIFY_STRING , uid)).collect(Collectors.toList());
+        return RedisUtils.mget(keys , Long.class);
     }
 }

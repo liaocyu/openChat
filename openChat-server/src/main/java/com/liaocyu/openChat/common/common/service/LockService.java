@@ -3,8 +3,10 @@ package com.liaocyu.openChat.common.common.service;
 import com.liaocyu.openChat.common.common.exception.BusinessException;
 import com.liaocyu.openChat.common.common.exception.CommonErrorEnum;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.TimeUnit;
@@ -17,29 +19,35 @@ import java.util.function.Supplier;
  * @description :
  */
 @Service
+@Slf4j
 public class LockService {
 
     private final RedissonClient redissonClient;
 
+    @Autowired
     public LockService(RedissonClient redissonClient) {
         this.redissonClient = redissonClient;
     }
 
-    @SneakyThrows // Lombox 提供的注解 ，用于在方法上自动抛出已检查异常 checked exception ,无需在方法签名中声明或者捕获异常
-    public <T> T executeWithLock(String key , int waitTime , TimeUnit timeUnit , Supplier<T> supplier){
+    public <T> T executeWithLockThrows(String key , int waitTime, TimeUnit unit, SupplierThrow<T> supplier) throws Throwable {
         RLock lock = redissonClient.getLock(key);
-        boolean success = lock.tryLock(waitTime, timeUnit);
-        if (!success) {
+        boolean lockSuccess = lock.tryLock(waitTime, unit);
+        if (!lockSuccess) {
             throw new BusinessException(CommonErrorEnum.LOCK_LIMIT);
         }
 
         try {
-            return supplier.get();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+            return supplier.get(); // 执行锁内的代码逻辑
         } finally {
-            lock.unlock();
+            if (lock.isLocked() && lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
         }
+    }
+
+    @SneakyThrows // Lombox 提供的注解 ，用于在方法上自动抛出已检查异常 checked exception ,无需在方法签名中声明或者捕获异常
+    public <T> T executeWithLock(String key , int waitTime , TimeUnit timeUnit , Supplier<T> supplier){
+        return executeWithLockThrows(key, waitTime, timeUnit, supplier::get);
     }
 
 
@@ -52,5 +60,16 @@ public class LockService {
             runnable.run();
             return null;
         });
+    }
+
+    @FunctionalInterface
+    public interface SupplierThrow<T> {
+
+        /**
+         * Gets a result.
+         *
+         * @return a result
+         */
+        T get() throws  Throwable;
     }
 }

@@ -106,17 +106,19 @@ public class FriendServiceImpl implements FriendService {
         }
         List<Long> friendRecordIds = userFriends.stream().map(UserFriend::getId).collect(Collectors.toList());
         userFriendDao.removeByIds(friendRecordIds);
-        // 禁用房间 TODO
+        // 禁用房间
         roomService.disableFriendRoom(Arrays.asList(uid, friendUid));
 
     }
 
     @Override
     public FriendCheckResp check(Long uid, FriendCheckReq request) {
-
+        // 从前端FriendCheckReq请求中 查出我的好友列表
         List<UserFriend> friendList = userFriendDao.getByFriends(uid, request.getUidList());
+        // 返回我的好友UID
         Set<Long> friendUidSet = friendList.stream().map(UserFriend::getFriendUid).collect(Collectors.toSet());
         List<FriendCheckResp.FriendCheck> friendCheckList = request.getUidList().stream().map(friendUid -> {
+            // 构造我的好友请求体
             FriendCheckResp.FriendCheck friendCheck = new FriendCheckResp.FriendCheck();
             friendCheck.setUid(friendUid);
             friendCheck.setIsFriend(friendUidSet.contains(friendUid));
@@ -134,10 +136,11 @@ public class FriendServiceImpl implements FriendService {
     @Override
     @RedissonLock(key = "#uid")
     public void apply(Long uid, FriendApplyReq request) {
+        //System.out.println("hahhahhahhahhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhaaaaaa");
         // 是否有好友关系
         UserFriend friend = userFriendDao.getByFriend(uid, request.getTargetUid());
         AssertUtil.isEmpty(friend, "你们已经是好友啦");
-        // 是否有待审批的申请记录（自己的）
+        // 是否有待审批的申请记录（自己的）申请状态是待审批 申请code是加好友
         UserApply selfApproving = userApplyDao.getFriendApproving(uid, request.getTargetUid());
         if (Objects.nonNull(selfApproving)) {
             log.info("已有好友申请记录,uid:{}, targetId:{}", uid, request.getTargetUid());
@@ -151,7 +154,7 @@ public class FriendServiceImpl implements FriendService {
             return;
         }
 
-        // 申请入库
+        // 申请入库 构造一个申请实体
         UserApply insert = FriendAdapter.buildFriendApply(uid, request);
         userApplyDao.save(insert);
         applicationEventPublisher.publishEvent(new UserApplyEvent(this, insert));
@@ -175,6 +178,13 @@ public class FriendServiceImpl implements FriendService {
         // chatService.sendMsg(MessageAdapter.buildAgreeMsg(roomFriend.getRoomId()), uid);
     }
 
+    /**
+     * 获取我的好友申请列表
+     * @param uid 我的uid
+     * @param request 请求
+     * @return
+     * request.plusPage()  page对象 （1，10）
+     */
     @Override
     public PageBaseResp<FriendApplyResp> pageApplyFriend(Long uid, PageBaseReq request) {
 
@@ -194,10 +204,14 @@ public class FriendServiceImpl implements FriendService {
         return new FriendUnreadResp(unReadCount);
     }
 
+    /**
+     * userApplyIpage.getRecords() 好友申请列表
+     */
     private void readApples(Long uid, IPage<UserApply> userApplyIpage) {
         List<Long> applyIds = userApplyIpage.getRecords()
                 .stream().map(UserApply::getId)
                 .collect(Collectors.toList());
+        // 更新好友申请信息未已读状态
         userApplyDao.readApples(uid, applyIds);
     }
 

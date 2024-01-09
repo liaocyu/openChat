@@ -68,6 +68,11 @@ public class UserFriendController {
         return ApiResult.success();
     }
 
+    /**
+     * 获取我的好友申请列表
+     * @param request 请求
+     * @return 我的好友申请列表
+     */
     @GetMapping("apply/page")
     @ApiOperation("好友申请列表")
     public ApiResult<PageBaseResp<FriendApplyResp>> page(@Valid PageBaseReq request) {
@@ -76,6 +81,12 @@ public class UserFriendController {
     }
 
 
+    /**
+     * TODO 联系人列表
+     * @see com.liaocyu.openChat.common.common.domain.vo.req.CursorPageBaseReq  游标翻页请求
+     * @param request 我的请求
+     * @return
+     */
     @GetMapping("page")
     @ApiOperation("联系人列表")
     public ApiResult<CursorPageBaseResp<FriendResp>> friendList(@Valid CursorPageBaseReq request) {
@@ -90,7 +101,7 @@ public class UserFriendController {
         return ApiResult.success(friendService.unread(uid));
     }
 
-    @PutMapping("/apply")
+    @PutMapping("apply")
     @ApiOperation("审批同意")
     public ApiResult<Void> applyApprove(@Valid @RequestBody FriendApproveReq request) {
         friendService.applyApprove(RequestHolder.get().getUid(), request);

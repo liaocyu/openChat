@@ -1,13 +1,13 @@
 package com.liaocyu.openChat.common.user.controller;
 
 
+import com.liaocyu.openChat.common.common.domain.dto.ItemInfoDTO;
+import com.liaocyu.openChat.common.common.domain.dto.SummeryInfoDTO;
 import com.liaocyu.openChat.common.common.domain.vo.resp.ApiResult;
 import com.liaocyu.openChat.common.common.utils.AssertUtil;
 import com.liaocyu.openChat.common.common.utils.RequestHolder;
 import com.liaocyu.openChat.common.user.domain.enums.RoleEnum;
-import com.liaocyu.openChat.common.user.domain.vo.req.user.BlackUserReq;
-import com.liaocyu.openChat.common.user.domain.vo.req.user.ModifyNameReq;
-import com.liaocyu.openChat.common.user.domain.vo.req.user.WearingBadgeReq;
+import com.liaocyu.openChat.common.user.domain.vo.req.user.*;
 import com.liaocyu.openChat.common.user.domain.vo.resp.BadgeResp;
 import com.liaocyu.openChat.common.user.domain.vo.resp.UserInfoResp;
 import com.liaocyu.openChat.common.user.service.IRoleService;
@@ -83,6 +83,19 @@ public class UserController {
         userService.black(req);
         return ApiResult.success();
     }
+
+    @PostMapping("public/summary/userInfo/batch")
+    @ApiOperation("用户聚合信息-返回的代表需要刷新的")
+    public ApiResult<List<SummeryInfoDTO>> getSummeryUserInfo(@Valid @RequestBody SummeryInfoReq req) {
+        return ApiResult.success(userService.getSummeryUserInfo(req));
+    }
+
+    @PostMapping("/public/badges/batch")
+    @ApiOperation("徽章聚合信息-返回的代表需要刷新的")
+    public ApiResult<List<ItemInfoDTO>> getItemInfo(@Valid @RequestBody ItemInfoReq req) {
+        return ApiResult.success(userService.getItemInfo(req));
+    }
+
 
 }
 
