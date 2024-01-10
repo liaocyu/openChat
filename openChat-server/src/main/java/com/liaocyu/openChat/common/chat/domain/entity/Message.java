@@ -1,13 +1,14 @@
-package com.liaocyu.openChat.common.user.domain.entity;
+package com.liaocyu.openChat.common.chat.domain.entity;
 
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.time.LocalDateTime;
-import com.baomidou.mybatisplus.annotation.TableField;
+
 import java.io.Serializable;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import java.util.Date;
+
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import lombok.*;
 
 /**
  * <p>
@@ -19,7 +20,10 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName("message")
+@TableName(value = "message", autoResultMap = true)
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Message implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -27,7 +31,7 @@ public class Message implements Serializable {
     /**
      * id
      */
-      @TableId(value = "id", type = IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**
@@ -58,6 +62,7 @@ public class Message implements Serializable {
      * 消息状态 0正常 1删除
      */
     @TableField("status")
+    @TableLogic(delval = "1" , value = "0")
     private Integer status;
 
     /**
@@ -73,22 +78,22 @@ public class Message implements Serializable {
     private Integer type;
 
     /**
-     * 扩展信息
+     * 消息扩展字段
      */
-    @TableField("extra")
+    @TableField(value = "extra", typeHandler = JacksonTypeHandler.class)
     private String extra;
 
     /**
      * 创建时间
      */
     @TableField("create_time")
-    private LocalDateTime createTime;
+    private Date createTime;
 
     /**
      * 修改时间
      */
     @TableField("update_time")
-    private LocalDateTime updateTime;
+    private Date updateTime;
 
 
 }

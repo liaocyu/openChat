@@ -1,17 +1,22 @@
-package com.liaocyu.openChat.common.user.domain.entity;
+package com.liaocyu.openChat.common.chat.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+
 import java.time.LocalDateTime;
+
 import com.baomidou.mybatisplus.annotation.TableField;
+
 import java.io.Serializable;
+import java.util.Date;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
  * <p>
- * 群成员表
+ * 单聊房间表
  * </p>
  *
  * @author <a href="https://github.com/liaocyu">liaocyu</a>
@@ -19,46 +24,58 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName("group_member")
-public class GroupMember implements Serializable {
+@TableName("room_friend")
+public class RoomFriend implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     /**
      * id
      */
-      @TableId(value = "id", type = IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**
-     * 群主id
+     * 房间id
      */
-    @TableField("group_id")
-    private Long groupId;
+    @TableField("room_id")
+    private Long roomId;
 
     /**
-     * 成员uid
+     * uid1（更小的uid）
      */
-    @TableField("uid")
-    private Long uid;
+    @TableField("uid1")
+    private Long uid1;
 
     /**
-     * 成员角色 1群主 2管理员 3普通成员
+     * uid2（更大的uid）
      */
-    @TableField("role")
-    private Integer role;
+    @TableField("uid2")
+    private Long uid2;
+
+    /**
+     * 房间key由两个uid拼接，先做排序uid1_uid2
+     */
+    @TableField("room_key")
+    private String roomKey;
+
+    /**
+     * 房间状态 0正常 1禁用(删好友了禁用)
+     */
+    @TableField("status")
+    private Integer status;
 
     /**
      * 创建时间
      */
     @TableField("create_time")
-    private LocalDateTime createTime;
+    private Date createTime;
 
     /**
      * 修改时间
      */
     @TableField("update_time")
-    private LocalDateTime updateTime;
+    private Date updateTime;
 
 
 }

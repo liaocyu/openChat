@@ -1,4 +1,4 @@
-package com.liaocyu.openChat.common.user.domain.entity;
+package com.liaocyu.openChat.common.chat.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
@@ -16,16 +16,16 @@ import lombok.EqualsAndHashCode;
 
 /**
  * <p>
- * 黑名单
+ * 房间表
  * </p>
  *
  * @author <a href="https://github.com/liaocyu">liaocyu</a>
- * @since 2023-12-28
+ * @since 2024-01-03
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName("black")
-public class Black implements Serializable {
+@TableName("room")
+public class Room implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -36,18 +36,34 @@ public class Black implements Serializable {
     private Long id;
 
     /**
-     * 拉黑目标类型 1.ip 2uid
-     *
-     * @see com.liaocyu.openChat.common.user.domain.enums.BlackTypeEnum
+     * 房间类型 1群聊
      */
     @TableField("type")
     private Integer type;
 
     /**
-     * 拉黑目标
+     * 是否全员展示 0否 1是
      */
-    @TableField("target")
-    private String target;
+    @TableField("hot_flag")
+    private Integer hotFlag;
+
+    /**
+     * 群最后消息的更新时间（热点群不需要写扩散，只更新这里）
+     */
+    @TableField("active_time")
+    private Date activeTime;
+
+    /**
+     * 会话中的最后一条消息id
+     */
+    @TableField("last_msg_id")
+    private Long lastMsgId;
+
+    /**
+     * 额外信息（根据不同类型房间有不同存储的东西）
+     */
+    @TableField("ext_json")
+    private String extJson;
 
     /**
      * 创建时间

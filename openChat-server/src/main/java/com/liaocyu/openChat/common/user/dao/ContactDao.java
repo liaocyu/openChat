@@ -1,8 +1,7 @@
 package com.liaocyu.openChat.common.user.dao;
 
-import com.liaocyu.openChat.common.user.domain.entity.Contact;
-import com.liaocyu.openChat.common.user.mapper.ContactMapper;
-import com.liaocyu.openChat.common.user.service.IContactService;
+import com.liaocyu.openChat.common.chat.domain.entity.Contact;
+import com.liaocyu.openChat.common.chat.mapper.ContactMapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 

@@ -90,7 +90,7 @@ public class UserController {
         return ApiResult.success(userService.getSummeryUserInfo(req));
     }
 
-    @PostMapping("/public/badges/batch")
+    @PostMapping("public/badges/batch")
     @ApiOperation("徽章聚合信息-返回的代表需要刷新的")
     public ApiResult<List<ItemInfoDTO>> getItemInfo(@Valid @RequestBody ItemInfoReq req) {
         return ApiResult.success(userService.getItemInfo(req));

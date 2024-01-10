@@ -1,8 +1,7 @@
 package com.liaocyu.openChat.common.user.dao;
 
-import com.liaocyu.openChat.common.user.domain.entity.RoomGroup;
-import com.liaocyu.openChat.common.user.mapper.RoomGroupMapper;
-import com.liaocyu.openChat.common.user.service.IRoomGroupService;
+import com.liaocyu.openChat.common.chat.domain.entity.RoomGroup;
+import com.liaocyu.openChat.common.chat.mapper.RoomGroupMapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 

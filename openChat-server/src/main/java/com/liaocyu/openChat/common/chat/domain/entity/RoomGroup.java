@@ -1,4 +1,4 @@
-package com.liaocyu.openChat.common.user.domain.entity;
+package com.liaocyu.openChat.common.chat.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
@@ -9,13 +9,14 @@ import java.time.LocalDateTime;
 import com.baomidou.mybatisplus.annotation.TableField;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
  * <p>
- * 会话列表
+ * 群聊房间表
  * </p>
  *
  * @author <a href="https://github.com/liaocyu">liaocyu</a>
@@ -23,8 +24,8 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName("contact")
-public class Contact implements Serializable {
+@TableName("room_group")
+public class RoomGroup implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -35,46 +36,46 @@ public class Contact implements Serializable {
     private Long id;
 
     /**
-     * uid
-     */
-    @TableField("uid")
-    private Long uid;
-
-    /**
      * 房间id
      */
     @TableField("room_id")
     private Long roomId;
 
     /**
-     * 阅读到的时间
+     * 群名称
      */
-    @TableField("read_time")
-    private LocalDateTime readTime;
+    @TableField("name")
+    private String name;
 
     /**
-     * 会话内消息最后更新的时间(只有普通会话需要维护，全员会话不需要维护)
+     * 群头像
      */
-    @TableField("active_time")
-    private LocalDateTime activeTime;
+    @TableField("avatar")
+    private String avatar;
 
     /**
-     * 会话最新消息id
+     * 额外信息（根据不同类型房间有不同存储的东西）
      */
-    @TableField("last_msg_id")
-    private Long lastMsgId;
+    @TableField("ext_json")
+    private String extJson;
+
+    /**
+     * 逻辑删除(0-正常,1-删除)
+     */
+    @TableField("delete_status")
+    private Integer deleteStatus;
 
     /**
      * 创建时间
      */
     @TableField("create_time")
-    private LocalDateTime createTime;
+    private Date createTime;
 
     /**
      * 修改时间
      */
     @TableField("update_time")
-    private LocalDateTime updateTime;
+    private Date updateTime;
 
 
 }

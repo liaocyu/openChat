@@ -1,8 +1,6 @@
 package com.liaocyu.openChat.common.user.service;
 
-import com.liaocyu.openChat.common.user.domain.entity.Room;
-import com.baomidou.mybatisplus.extension.service.IService;
-import com.liaocyu.openChat.common.user.domain.entity.RoomFriend;
+import com.liaocyu.openChat.common.chat.domain.entity.RoomFriend;
 
 import java.util.List;
 

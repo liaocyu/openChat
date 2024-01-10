@@ -1,6 +1,6 @@
 package com.liaocyu.openChat.common.user.service;
 
-import com.liaocyu.openChat.common.user.domain.entity.GroupMember;
+import com.liaocyu.openChat.common.chat.domain.entity.GroupMember;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**

@@ -1,4 +1,4 @@
-package com.liaocyu.openChat.common.user.domain.enums;
+package com.liaocyu.openChat.common.chat.domain.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

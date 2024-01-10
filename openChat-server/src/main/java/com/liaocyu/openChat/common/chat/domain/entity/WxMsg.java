@@ -1,31 +1,25 @@
-package com.liaocyu.openChat.common.user.domain.entity;
+package com.liaocyu.openChat.common.chat.domain.entity;
 
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-
-import java.time.LocalDateTime;
-
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.util.Date;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
 /**
- * <p>
- * 用户角色关系表
- * </p>
- *
- * @author <a href="https://github.com/liaocyu">liaocyu</a>
- * @since 2023-12-28
+ * @author : create by lcy
+ * @Project : openChat
+ * @createTime : 2024/1/10 10:04
+ * @description : 微信消息表
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName("user_role")
-public class UserRole implements Serializable {
+@TableName("wx_msg")
+public class WxMsg implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -36,16 +30,16 @@ public class UserRole implements Serializable {
     private Long id;
 
     /**
-     * uid
+     * 微信openid用户标识
      */
-    @TableField("uid")
-    private Long uid;
+    @TableField("open_id")
+    private String openId;
 
     /**
-     * 角色id
+     * 用户消息
      */
-    @TableField("role_id")
-    private Long roleId;
+    @TableField("msg")
+    private String msg;
 
     /**
      * 创建时间

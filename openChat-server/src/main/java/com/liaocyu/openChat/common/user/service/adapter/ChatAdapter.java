@@ -1,10 +1,10 @@
 package com.liaocyu.openChat.common.user.service.adapter;
 
 import com.liaocyu.openChat.common.common.domain.enums.NormalOrNoEnum;
-import com.liaocyu.openChat.common.user.domain.entity.Room;
-import com.liaocyu.openChat.common.user.domain.entity.RoomFriend;
-import com.liaocyu.openChat.common.user.domain.enums.HotFlagEnum;
-import com.liaocyu.openChat.common.user.domain.enums.RoomTypeEnum;
+import com.liaocyu.openChat.common.chat.domain.entity.Room;
+import com.liaocyu.openChat.common.chat.domain.entity.RoomFriend;
+import com.liaocyu.openChat.common.chat.domain.enums.HotFlagEnum;
+import com.liaocyu.openChat.common.chat.domain.enums.RoomTypeEnum;
 
 import java.util.List;
 import java.util.stream.Collectors;

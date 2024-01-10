@@ -1,6 +1,6 @@
-package com.liaocyu.openChat.common.user.mapper;
+package com.liaocyu.openChat.common.chat.mapper;
 
-import com.liaocyu.openChat.common.user.domain.entity.RoomGroup;
+import com.liaocyu.openChat.common.chat.domain.entity.RoomGroup;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**

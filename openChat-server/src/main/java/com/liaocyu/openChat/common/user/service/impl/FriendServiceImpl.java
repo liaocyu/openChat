@@ -12,7 +12,7 @@ import com.liaocyu.openChat.common.common.utils.AssertUtil;
 import com.liaocyu.openChat.common.user.dao.UserApplyDao;
 import com.liaocyu.openChat.common.user.dao.UserDao;
 import com.liaocyu.openChat.common.user.dao.UserFriendDao;
-import com.liaocyu.openChat.common.user.domain.entity.RoomFriend;
+import com.liaocyu.openChat.common.chat.domain.entity.RoomFriend;
 import com.liaocyu.openChat.common.user.domain.entity.User;
 import com.liaocyu.openChat.common.user.domain.entity.UserApply;
 import com.liaocyu.openChat.common.user.domain.entity.UserFriend;

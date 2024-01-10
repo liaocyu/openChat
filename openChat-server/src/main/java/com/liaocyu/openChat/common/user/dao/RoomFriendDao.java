@@ -1,9 +1,8 @@
 package com.liaocyu.openChat.common.user.dao;
 
 import com.liaocyu.openChat.common.common.domain.enums.NormalOrNoEnum;
-import com.liaocyu.openChat.common.user.domain.entity.RoomFriend;
-import com.liaocyu.openChat.common.user.mapper.RoomFriendMapper;
-import com.liaocyu.openChat.common.user.service.IRoomFriendService;
+import com.liaocyu.openChat.common.chat.domain.entity.RoomFriend;
+import com.liaocyu.openChat.common.chat.mapper.RoomFriendMapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
