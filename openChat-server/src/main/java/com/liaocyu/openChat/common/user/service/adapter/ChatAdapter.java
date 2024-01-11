@@ -20,8 +20,9 @@ public class ChatAdapter {
     public static final String SEPARATOR = ",";
 
     public static String generateRoomKey(List<Long> uidList) {
+        // 10443  10003
         return uidList.stream()
-                .sorted()
+                .sorted() // 将自己的uid和好友的uid进行排序后使用 , 进行拼接
                 .map(String::valueOf)
                 .collect(Collectors.joining(SEPARATOR));
     }

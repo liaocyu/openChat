@@ -1,4 +1,4 @@
-package com.liaocyu.openChat.common.user.dao;
+package com.liaocyu.openChat.common.chat.dao;
 
 import com.liaocyu.openChat.common.chat.domain.entity.Contact;
 import com.liaocyu.openChat.common.chat.mapper.ContactMapper;

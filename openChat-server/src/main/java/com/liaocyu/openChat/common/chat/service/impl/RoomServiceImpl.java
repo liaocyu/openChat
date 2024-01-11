@@ -1,18 +1,19 @@
-package com.liaocyu.openChat.common.user.service.impl;
+package com.liaocyu.openChat.common.chat.service.impl;
 
 import com.liaocyu.openChat.common.common.domain.enums.NormalOrNoEnum;
 import com.liaocyu.openChat.common.common.utils.AssertUtil;
-import com.liaocyu.openChat.common.user.dao.RoomDao;
-import com.liaocyu.openChat.common.user.dao.RoomFriendDao;
+import com.liaocyu.openChat.common.chat.dao.RoomDao;
+import com.liaocyu.openChat.common.chat.dao.RoomFriendDao;
 import com.liaocyu.openChat.common.chat.domain.entity.Room;
 import com.liaocyu.openChat.common.chat.domain.entity.RoomFriend;
 import com.liaocyu.openChat.common.chat.domain.enums.RoomTypeEnum;
-import com.liaocyu.openChat.common.user.service.IRoomService;
+import com.liaocyu.openChat.common.chat.service.RoomService;
 import com.liaocyu.openChat.common.user.service.adapter.ChatAdapter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -22,16 +23,16 @@ import java.util.Objects;
  * @createTime : 2024/1/4 10:22
  * @description :
  */
-@Service("IRoomService")
-public class RoomServiceImpl implements IRoomService {
+@Service("roomService")
+public class RoomServiceImpl implements RoomService {
 
-    private final RoomFriendDao roomFriendDao;
     private final RoomDao roomDao;
+    private final RoomFriendDao roomFriendDao;
 
     @Autowired
-    public RoomServiceImpl(RoomFriendDao roomFriendDao , RoomDao roomDao) {
-        this.roomFriendDao = roomFriendDao;
+    public RoomServiceImpl(RoomDao roomDao , RoomFriendDao roomFriendDao) {
         this.roomDao = roomDao;
+        this.roomFriendDao = roomFriendDao;
     }
 
     @Override
@@ -59,6 +60,14 @@ public class RoomServiceImpl implements IRoomService {
             roomFriend = createFriendRoom(room.getId(), uidList);
         }
         return null;
+    }
+
+    @Override
+    public RoomFriend getFriendRoom(Long uid1, Long uid2) {
+        // 10443  10003
+        String key = ChatAdapter.generateRoomKey(Arrays.asList(uid1, uid2));
+
+        return roomFriendDao.getByKey(key);
     }
 
     private RoomFriend createFriendRoom(Long roomId, List<Long> uidList) {

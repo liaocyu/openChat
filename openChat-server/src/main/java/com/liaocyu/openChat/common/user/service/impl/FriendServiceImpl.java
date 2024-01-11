@@ -23,7 +23,7 @@ import com.liaocyu.openChat.common.user.domain.vo.resp.FriendApplyResp;
 import com.liaocyu.openChat.common.user.domain.vo.resp.FriendCheckResp;
 import com.liaocyu.openChat.common.user.domain.vo.resp.FriendResp;
 import com.liaocyu.openChat.common.user.domain.vo.resp.FriendUnreadResp;
-import com.liaocyu.openChat.common.user.service.IRoomService;
+import com.liaocyu.openChat.common.chat.service.RoomService;
 import com.liaocyu.openChat.common.user.service.adapter.FriendAdapter;
 import com.liaocyu.openChat.common.user.service.FriendService;
 import lombok.extern.slf4j.Slf4j;
@@ -54,12 +54,12 @@ public class FriendServiceImpl implements FriendService {
 
     private final UserFriendDao userFriendDao;
     private final UserDao userDao;
-    private final IRoomService roomService;
+    private final RoomService roomService;
     private final UserApplyDao userApplyDao;
     private final ApplicationEventPublisher applicationEventPublisher;
 
     @Autowired
-    public FriendServiceImpl(UserFriendDao userFriendDao, UserDao userDao, IRoomService roomService, UserApplyDao userApplyDao, ApplicationEventPublisher applicationEventPublisher) {
+    public FriendServiceImpl(UserFriendDao userFriendDao, UserDao userDao, RoomService roomService, UserApplyDao userApplyDao, ApplicationEventPublisher applicationEventPublisher) {
         this.userFriendDao = userFriendDao;
         this.userDao = userDao;
         this.roomService = roomService;

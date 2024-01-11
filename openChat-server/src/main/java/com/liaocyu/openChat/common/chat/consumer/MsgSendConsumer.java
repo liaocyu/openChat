@@ -1,5 +1,6 @@
 package com.liaocyu.openChat.common.chat.consumer;
 
+import com.liaocyu.openChat.common.common.constant.MQConstant;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
 import org.springframework.stereotype.Component;
 

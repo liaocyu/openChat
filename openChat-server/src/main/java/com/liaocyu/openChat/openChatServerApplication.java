@@ -11,9 +11,9 @@ import org.springframework.boot.web.servlet.ServletComponentScan;
  * @createTime : 2023/12/8 11:51
  * @description :
  */
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {"com.liaocyu.openChat"})
 @ServletComponentScan
-@MapperScan({"com.liaocyu.openChat.common.user.mapper"})
+@MapperScan({"com.liaocyu.openChat.common.**.mapper"})
 public class openChatServerApplication {
     public static void main(String[] args) {
         SpringApplication.run(openChatServerApplication.class , args);
