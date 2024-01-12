@@ -4,6 +4,7 @@ import com.liaocyu.openChat.common.chat.domain.vo.req.ContactFriendReq;
 import com.liaocyu.openChat.common.chat.domain.vo.resp.ChatRoomResp;
 import com.liaocyu.openChat.common.chat.service.RoomAppService;
 import com.liaocyu.openChat.common.common.domain.vo.req.CursorPageBaseReq;
+import com.liaocyu.openChat.common.common.domain.vo.req.IdReqVO;
 import com.liaocyu.openChat.common.common.domain.vo.resp.ApiResult;
 import com.liaocyu.openChat.common.common.domain.vo.resp.CursorPageBaseResp;
 import com.liaocyu.openChat.common.common.utils.RequestHolder;
@@ -43,10 +44,20 @@ public class ContactController {
         return ApiResult.success(roomAppService.getContactPage(request, uid));
     }
 
+    @GetMapping("public/contact/detail")
+    @ApiOperation("会话详情")
+    public ApiResult<ChatRoomResp> getContactDetail(@Valid IdReqVO request) {
+        Long uid = RequestHolder.get().getUid();
+        roomAppService.getContactDetail(uid, request.getId());
+        return null;
+    }
+
     @GetMapping("public/contact/detail/friend")
     @ApiOperation("会话详情(联系人列表发消息用)")
     public ApiResult<ChatRoomResp> getContactDetailByFriend(@Valid ContactFriendReq request) {
         Long uid = RequestHolder.get().getUid();
         return ApiResult.success(roomAppService.getContactDetailByFriend(uid, request.getUid()));
     }
+
+
 }

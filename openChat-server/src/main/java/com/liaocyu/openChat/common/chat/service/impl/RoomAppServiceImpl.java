@@ -1,12 +1,15 @@
 package com.liaocyu.openChat.common.chat.service.impl;
 
+import com.liaocyu.openChat.common.chat.domain.entity.Room;
 import com.liaocyu.openChat.common.chat.domain.entity.RoomFriend;
 import com.liaocyu.openChat.common.chat.domain.vo.resp.ChatRoomResp;
 import com.liaocyu.openChat.common.chat.service.RoomService;
 import com.liaocyu.openChat.common.chat.service.RoomAppService;
+import com.liaocyu.openChat.common.chat.service.cache.RoomCache;
 import com.liaocyu.openChat.common.common.domain.vo.req.CursorPageBaseReq;
 import com.liaocyu.openChat.common.common.domain.vo.resp.CursorPageBaseResp;
 import com.liaocyu.openChat.common.common.utils.AssertUtil;
+import com.liaocyu.openChat.common.user.service.adapter.FriendAdapter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +28,9 @@ public class RoomAppServiceImpl implements RoomAppService {
 
     @Autowired
     private RoomService roomService;
+    @Autowired
+    private RoomCache roomCache;
+
 
     /**
      * 获取会话列表
@@ -64,12 +70,22 @@ public class RoomAppServiceImpl implements RoomAppService {
         return null;
     }
 
+    // TODO buildContactResp(uid, Collections.singletonList(friendRoom.getRoomId())).get(0)
     @Override
     public ChatRoomResp getContactDetailByFriend(Long uid, Long friendUid) {
 
         RoomFriend friendRoom = roomService.getFriendRoom(uid, friendUid); // 10443  10003
         AssertUtil.isNotEmpty(friendRoom, "Ta 不是你的好友");
         return buildContactResp(uid, Collections.singletonList(friendRoom.getRoomId())).get(0);
+    }
+
+    // TODO buildContactResp(uid, Collections.singletonList(roomId)).get(0)
+    @Override
+    public ChatRoomResp getContactDetail(Long uid, Long roomId) {
+        // 查询好友之间的聊天室
+        Room room = roomCache.get(roomId);
+        AssertUtil.isNotEmpty(room , "房间号不能为空");
+        return buildContactResp(uid, Collections.singletonList(roomId)).get(0);
     }
 
     @NotNull

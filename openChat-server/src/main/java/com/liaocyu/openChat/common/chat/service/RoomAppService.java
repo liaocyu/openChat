@@ -20,4 +20,6 @@ public interface RoomAppService {
     CursorPageBaseResp<ChatRoomResp> getContactPage(CursorPageBaseReq request, Long uid);
 
     ChatRoomResp getContactDetailByFriend(Long uid, Long friendUid);
+
+    ChatRoomResp getContactDetail(Long uid, Long id);
 }
