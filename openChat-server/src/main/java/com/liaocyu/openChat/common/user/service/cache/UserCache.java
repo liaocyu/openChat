@@ -3,6 +3,7 @@ package com.liaocyu.openChat.common.user.service.cache;
 import com.liaocyu.openChat.common.common.constant.RedisKey;
 import com.liaocyu.openChat.common.common.utils.RedisUtils;
 import com.liaocyu.openChat.common.user.dao.BlackDao;
+import com.liaocyu.openChat.common.user.dao.UserDao;
 import com.liaocyu.openChat.common.user.dao.UserRoleDao;
 import com.liaocyu.openChat.common.user.domain.entity.Black;
 import com.liaocyu.openChat.common.user.domain.entity.UserRole;
@@ -22,19 +23,21 @@ import java.util.stream.Collectors;
  * @author : create by lcy
  * @Project : openChat
  * @createTime : 2023/12/28 11:23
- * @description :
+ * @description : 用户相关缓存
  */
 @Component
 public class UserCache {
 
     private final UserRoleDao userRoleDao;
     private final BlackDao blackDao;
+    private final UserDao userDao;
 
     @Autowired
-    public UserCache(UserRoleDao userRoleDao , BlackDao blackDao
+    public UserCache(UserRoleDao userRoleDao , BlackDao blackDao , UserDao userDao
     ) {
         this.userRoleDao = userRoleDao;
         this.blackDao = blackDao;
+        this.userDao = userDao;
     }
 
     /**
@@ -48,6 +51,11 @@ public class UserCache {
         return userRoles.stream()
                 .map(UserRole::getRoleId)
                 .collect(Collectors.toSet());
+    }
+
+    public Long getOnlineNum() {
+        String onlineKey = RedisKey.getKey(RedisKey.ONLINE_UID_ZET);
+        return RedisUtils.zCard(onlineKey);
     }
 
     /**

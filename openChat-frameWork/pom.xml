@@ -13,6 +13,10 @@
     <packaging>pom</packaging>
     <modules>
         <module>openChat-common-starter</module>
+        <module>openChat-redis</module>
+        <module>openChat-oss-starter</module>
+        <module>openChat-transaction</module>
+        <module>openChat-frequency-control</module>
     </modules>
 
     <properties>

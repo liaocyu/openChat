@@ -53,16 +53,16 @@
                 <artifactId>openChat-common-starter</artifactId>
                 <version>${version}</version>
             </dependency>
-            <!--<dependency>
-                <groupId>com.abin.mallchat</groupId>
-                <artifactId>mallchat-oss-starter</artifactId>
+            <dependency>
+                <groupId>com.liaocyu</groupId>
+                <artifactId>openChat-oss-starter</artifactId>
                 <version>${version}</version>
             </dependency>
             <dependency>
-                <groupId>com.abin.mallchat</groupId>
-                <artifactId>mallchat-transaction</artifactId>
+                <groupId>com.liaocyu</groupId>
+                <artifactId>openChat-transaction</artifactId>
                 <version>${version}</version>
-            </dependency>-->
+            </dependency>
             <dependency>
                 <groupId>com.squareup.okhttp3</groupId>
                 <artifactId>okhttp</artifactId>

@@ -1,10 +1,12 @@
 package com.liaocyu.openChat.common.user.service.adapter;
 
+import com.liaocyu.openChat.common.chat.domain.entity.RoomGroup;
 import com.liaocyu.openChat.common.common.domain.enums.NormalOrNoEnum;
 import com.liaocyu.openChat.common.chat.domain.entity.Room;
 import com.liaocyu.openChat.common.chat.domain.entity.RoomFriend;
 import com.liaocyu.openChat.common.chat.domain.enums.HotFlagEnum;
 import com.liaocyu.openChat.common.chat.domain.enums.RoomTypeEnum;
+import com.liaocyu.openChat.common.user.domain.entity.User;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -50,5 +52,13 @@ public class ChatAdapter {
         roomFriend.setRoomKey(generateRoomKey(uidList));
         roomFriend.setStatus(NormalOrNoEnum.NORMAL.getStatus());
         return roomFriend;
+    }
+
+    public static RoomGroup buildGroupRoom(User user, Long roomId) {
+        RoomGroup roomGroup = new RoomGroup();
+        roomGroup.setName(user.getName() + "的群组");
+        roomGroup.setAvatar(user.getAvatar());
+        roomGroup.setRoomId(roomId);
+        return roomGroup;
     }
 }

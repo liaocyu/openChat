@@ -11,6 +11,9 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.liaocyu.openChat.common.chat.domain.enums.HotFlagEnum;
+import com.liaocyu.openChat.common.chat.domain.enums.RoomTypeEnum;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -36,13 +39,17 @@ public class Room implements Serializable {
     private Long id;
 
     /**
-     * 房间类型 1群聊
+     * 房间类型 1群聊 2单聊
+     *
+     * @see com.liaocyu.openChat.common.chat.domain.enums.RoomTypeEnum
      */
     @TableField("type")
     private Integer type;
 
     /**
      * 是否全员展示 0否 1是
+     *
+     * @see com.liaocyu.openChat.common.chat.domain.enums.HotFlagEnum
      */
     @TableField("hot_flag")
     private Integer hotFlag;
@@ -77,5 +84,19 @@ public class Room implements Serializable {
     @TableField("update_time")
     private Date updateTime;
 
+    @JsonIgnore
+    public boolean isHotRoom() {
+        return HotFlagEnum.of(this.hotFlag) == HotFlagEnum.YES;
+    }
+
+    @JsonIgnore
+    public boolean isRoomFriend() {
+        return RoomTypeEnum.of(this.type) == RoomTypeEnum.FRIEND;
+    }
+
+    @JsonIgnore
+    public boolean isRoomGroup() {
+        return RoomTypeEnum.of(this.type) == RoomTypeEnum.GROUP;
+    }
 
 }

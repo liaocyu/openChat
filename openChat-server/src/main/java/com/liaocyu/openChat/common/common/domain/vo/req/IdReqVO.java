@@ -11,7 +11,7 @@ import javax.validation.constraints.NotNull;
  * @author : create by lcy
  * @Project : openChat
  * @createTime : 2024/1/12 11:17
- * @description :
+ * @description : id req请求
  */
 @Data
 @NoArgsConstructor

@@ -1,4 +1,4 @@
-package com.liaocyu.openChat.common.common.utils;
+package com.liaocyu.openchat.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -8,9 +8,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 
 /**
- * Description:
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
- * Date: 2023-04-25
+ * @author : create by lcy
+ * @Project : openChat
+ * @createTime : 2024/1/15 17:15
+ * @description :
  */
 public class JsonUtils {
     private static final ObjectMapper jsonMapper = new ObjectMapper();

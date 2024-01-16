@@ -1,5 +1,10 @@
 package com.liaocyu.openChat.common.chat.service.impl;
 
+import com.liaocyu.openChat.common.chat.dao.GroupMemberDao;
+import com.liaocyu.openChat.common.chat.dao.RoomGroupDao;
+import com.liaocyu.openChat.common.chat.domain.entity.GroupMember;
+import com.liaocyu.openChat.common.chat.domain.entity.RoomGroup;
+import com.liaocyu.openChat.common.chat.domain.enums.GroupRoleEnum;
 import com.liaocyu.openChat.common.common.domain.enums.NormalOrNoEnum;
 import com.liaocyu.openChat.common.common.utils.AssertUtil;
 import com.liaocyu.openChat.common.chat.dao.RoomDao;
@@ -8,7 +13,9 @@ import com.liaocyu.openChat.common.chat.domain.entity.Room;
 import com.liaocyu.openChat.common.chat.domain.entity.RoomFriend;
 import com.liaocyu.openChat.common.chat.domain.enums.RoomTypeEnum;
 import com.liaocyu.openChat.common.chat.service.RoomService;
+import com.liaocyu.openChat.common.user.domain.entity.User;
 import com.liaocyu.openChat.common.user.service.adapter.ChatAdapter;
+import com.liaocyu.openChat.common.user.service.cache.UserInfoCache;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,11 +35,18 @@ public class RoomServiceImpl implements RoomService {
 
     private final RoomDao roomDao;
     private final RoomFriendDao roomFriendDao;
+    private final GroupMemberDao groupMemberDao;
+    private final RoomGroupDao roomGroupDao;
+    private final UserInfoCache userInfoCache;
 
     @Autowired
-    public RoomServiceImpl(RoomDao roomDao , RoomFriendDao roomFriendDao) {
+    public RoomServiceImpl(RoomDao roomDao , RoomFriendDao roomFriendDao,GroupMemberDao groupMemberDao ,
+                           RoomGroupDao roomGroupDao ,UserInfoCache userInfoCache) {
         this.roomDao = roomDao;
         this.roomFriendDao = roomFriendDao;
+        this.groupMemberDao = groupMemberDao;
+        this.roomGroupDao = roomGroupDao;
+        this.userInfoCache = userInfoCache;
     }
 
     @Override
@@ -68,6 +82,27 @@ public class RoomServiceImpl implements RoomService {
         String key = ChatAdapter.generateRoomKey(Arrays.asList(uid1, uid2));
 
         return roomFriendDao.getByKey(key);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public RoomGroup createGroupRoom(Long uid) {
+        // 查询uid所拥有的群聊 如果查询到直接抛出异常
+        List<GroupMember> selfGroup = groupMemberDao.getSelfGroup(uid);
+        AssertUtil.isEmpty(selfGroup, "每个人只能创建一个群");
+        User user = userInfoCache.get(uid); // 拿到用户详细信息
+        Room room = createRoom(RoomTypeEnum.GROUP); // 构造群聊实体并保存群聊信息
+        //插入群
+        RoomGroup roomGroup = ChatAdapter.buildGroupRoom(user, room.getId());
+        roomGroupDao.save(roomGroup);
+        //插入群主
+        GroupMember leader = GroupMember.builder()
+                .role(GroupRoleEnum.LEADER.getType())
+                .groupId(roomGroup.getId())
+                .uid(uid)
+                .build();
+        groupMemberDao.save(leader);
+        return roomGroup;
     }
 
     private RoomFriend createFriendRoom(Long roomId, List<Long> uidList) {

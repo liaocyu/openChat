@@ -44,6 +44,11 @@ public class ContactController {
         return ApiResult.success(roomAppService.getContactPage(request, uid));
     }
 
+    /**
+     *
+     * id
+     * @return
+     */
     @GetMapping("public/contact/detail")
     @ApiOperation("会话详情")
     public ApiResult<ChatRoomResp> getContactDetail(@Valid IdReqVO request) {

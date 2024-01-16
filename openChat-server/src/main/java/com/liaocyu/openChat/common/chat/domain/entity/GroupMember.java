@@ -11,8 +11,8 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
 import java.util.Date;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import com.liaocyu.openChat.common.chat.domain.enums.GroupRoleEnum;
+import lombok.*;
 
 /**
  * <p>
@@ -25,6 +25,9 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @TableName("group_member")
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class GroupMember implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -49,6 +52,8 @@ public class GroupMember implements Serializable {
 
     /**
      * 成员角色 1群主 2管理员 3普通成员
+     *
+     * @see GroupRoleEnum
      */
     @TableField("role")
     private Integer role;

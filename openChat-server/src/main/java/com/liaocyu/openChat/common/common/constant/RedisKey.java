@@ -19,6 +19,12 @@ public class RedisKey {
      */
     public static final String OFFLINE_UID_ZET = "offline";
 
+
+    /**
+     * 群组详情
+     */
+    public static final String GROUP_INFO_STRING = "groupInfo:roomId_%d";
+
     /**
      * 用户token的key
      */

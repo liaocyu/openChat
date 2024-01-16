@@ -2,15 +2,14 @@ package com.liaocyu.openChat.common.user.service.impl;
 
 import cn.hutool.core.thread.NamedThreadFactory;
 import cn.hutool.http.HttpUtil;
-import cn.hutool.json.JSONUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.liaocyu.openChat.common.common.domain.vo.resp.ApiResult;
-import com.liaocyu.openChat.common.common.utils.JsonUtils;
 import com.liaocyu.openChat.common.user.dao.UserDao;
 import com.liaocyu.openChat.common.user.domain.entity.IpDetail;
 import com.liaocyu.openChat.common.user.domain.entity.IpInfo;
 import com.liaocyu.openChat.common.user.domain.entity.User;
 import com.liaocyu.openChat.common.user.service.IpService;
+import com.liaocyu.openchat.utils.JsonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.DisposableBean;

@@ -1,6 +1,7 @@
 package com.liaocyu.openChat.common.chat.service;
 
 import com.liaocyu.openChat.common.chat.domain.entity.RoomFriend;
+import com.liaocyu.openChat.common.chat.domain.entity.RoomGroup;
 
 import java.util.List;
 
@@ -28,4 +29,6 @@ public interface RoomService {
     RoomFriend createFriendRoom(List<Long> uidList);
 
     RoomFriend getFriendRoom(Long uid1 , Long uid2);
+
+    RoomGroup createGroupRoom(Long uid);
 }

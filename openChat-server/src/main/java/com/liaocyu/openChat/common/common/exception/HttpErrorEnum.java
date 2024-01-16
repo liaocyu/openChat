@@ -3,7 +3,8 @@ package com.liaocyu.openChat.common.common.exception;
 import cn.hutool.http.ContentType;
 import com.google.common.base.Charsets;
 import com.liaocyu.openChat.common.common.domain.vo.resp.ApiResult;
-import com.liaocyu.openChat.common.common.utils.JsonUtils;
+
+import com.liaocyu.openchat.utils.JsonUtils;
 import lombok.AllArgsConstructor;
 
 import javax.servlet.http.HttpServletResponse;
