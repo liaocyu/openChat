@@ -15,7 +15,7 @@ import java.util.List;
  * @author : create by lcy
  * @Project : openChat
  * @createTime : 2024/1/10 14:56
- * @description :
+ * @description : 聊天室应用总接口
  */
 public interface RoomAppService {
 

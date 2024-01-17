@@ -39,7 +39,7 @@ public class GroupMemberDao extends ServiceImpl<GroupMemberMapper, GroupMember> 
 
     /**
      *
-     * @param groupId 群主Id == 群聊表Id
+     * @param groupId 群主Id
      * @return
      */
     public List<Long> getMemberUidList(Long groupId) {

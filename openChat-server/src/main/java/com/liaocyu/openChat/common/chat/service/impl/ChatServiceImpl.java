@@ -1,13 +1,20 @@
 package com.liaocyu.openChat.common.chat.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Pair;
 import com.liaocyu.openChat.common.chat.dao.GroupMemberDao;
+import com.liaocyu.openChat.common.chat.dao.MessageMarkDao;
 import com.liaocyu.openChat.common.chat.dao.RoomGroupDao;
+import com.liaocyu.openChat.common.chat.domain.entity.Message;
+import com.liaocyu.openChat.common.chat.domain.entity.MessageMark;
 import com.liaocyu.openChat.common.chat.domain.entity.RoomGroup;
 import com.liaocyu.openChat.common.chat.domain.vo.req.MemberReq;
 import com.liaocyu.openChat.common.chat.domain.vo.resp.ChatMemberResp;
+import com.liaocyu.openChat.common.chat.domain.vo.resp.ChatMessageResp;
 import com.liaocyu.openChat.common.chat.service.ChatService;
 import com.liaocyu.openChat.common.chat.service.adapter.MemberAdapter;
+import com.liaocyu.openChat.common.chat.service.adapter.MessageAdapter;
 import com.liaocyu.openChat.common.chat.service.helper.ChatMemberHelper;
 import com.liaocyu.openChat.common.common.domain.vo.req.CursorPageBaseReq;
 import com.liaocyu.openChat.common.common.domain.vo.resp.CursorPageBaseResp;
@@ -19,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -38,27 +46,29 @@ public class ChatServiceImpl implements ChatService {
     private final UserDao userDao;
     private final RoomGroupDao roomGroupDao;
     private final GroupMemberDao groupMemberDao;
+    private final MessageMarkDao messageMarkDao;
 
     @Autowired
-    public ChatServiceImpl(UserDao userDao , RoomGroupDao roomGroupDao , GroupMemberDao groupMemberDao ) {
+    public ChatServiceImpl(UserDao userDao , RoomGroupDao roomGroupDao , GroupMemberDao groupMemberDao , MessageMarkDao messageMarkDao ) {
         this.userDao = userDao;
         this.roomGroupDao = roomGroupDao;
         this.groupMemberDao = groupMemberDao ;
+        this.messageMarkDao = messageMarkDao ;
     }
 
 
     /**
      * 获取群成员列表
      *
-     * @param memberUidList
-     * @param request
+     * @param memberUidList 群成员 Uid 列表
+     * @param request 群成员接口请求
      * @return
      */
     @Override
     public CursorPageBaseResp<ChatMemberResp> getMemberPage(List<Long> memberUidList, MemberReq request) {
 
         Pair<ChatActiveStatusEnum, String> pair = ChatMemberHelper.getCursorPair(request.getCursor());
-        ChatActiveStatusEnum activeStatusEnum = pair.getKey();
+        ChatActiveStatusEnum activeStatusEnum = pair.getKey();// activeStatusEnum: "ONLINE"
         String timeCursor = pair.getValue();
         List<ChatMemberResp> resultList = new ArrayList<>();// 最终列表
         Boolean isLast = Boolean.FALSE;
@@ -86,5 +96,19 @@ public class ChatServiceImpl implements ChatService {
         resultList.forEach(member -> member.setRoleId(uidMapRole.get(member.getUid())));
         //组装结果
         return new CursorPageBaseResp<>(ChatMemberHelper.generateCursor(activeStatusEnum, timeCursor), isLast, resultList);
+    }
+
+    @Override
+    public ChatMessageResp getMsgResp(Message message, Long receiveUid) {
+        return CollUtil.getFirst(getMsgRespBatch(Collections.singletonList(message), receiveUid));
+    }
+
+    public List<ChatMessageResp> getMsgRespBatch(List<Message> messages, Long receiveUid) {
+        if (CollectionUtil.isEmpty(messages)) {
+            return new ArrayList<>();
+        }
+        //查询消息标志
+        List<MessageMark> msgMark = messageMarkDao.getValidMarkByMsgIdBatch(messages.stream().map(Message::getId).collect(Collectors.toList()));
+        return MessageAdapter.buildMsgResp(messages, msgMark, receiveUid);
     }
 }

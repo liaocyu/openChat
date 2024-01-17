@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * @author : create by lcy
@@ -19,5 +20,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class MemberReq extends CursorPageBaseReq {
     @ApiModelProperty("房间号")
-    private Long roomId = 1L;
+    private Long roomId = 1L; // 默认设置为1L
 }

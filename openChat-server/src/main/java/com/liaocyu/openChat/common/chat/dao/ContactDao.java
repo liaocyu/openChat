@@ -11,6 +11,7 @@ import com.liaocyu.openChat.common.common.domain.vo.resp.CursorPageBaseResp;
 import com.liaocyu.openChat.common.common.utils.CursorUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -48,5 +49,16 @@ public class ContactDao extends ServiceImpl<ContactMapper, Contact> {
         return CursorUtils.getCursorPageByMysql(this, request, wrapper -> {
             wrapper.eq(Contact::getUid, uid);
         }, Contact::getActiveTime);
+    }
+
+    /**
+     * 更新所有群成员会话时间
+     * @param roomId
+     * @param memberUidList
+     * @param msgId
+     * @param activeTime
+     */
+    public void refreshOrCreateActiveTime(Long roomId, List<Long> memberUidList, Long msgId, Date activeTime) {
+        this.baseMapper.refreshOrCreateActiveTime(roomId, memberUidList, msgId, activeTime);
     }
 }

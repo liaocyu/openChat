@@ -4,7 +4,10 @@ import com.liaocyu.openChat.common.chat.domain.entity.MessageMark;
 import com.liaocyu.openChat.common.chat.mapper.MessageMarkMapper;
 import com.liaocyu.openChat.common.chat.service.IMessageMarkService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.liaocyu.openChat.common.common.domain.enums.NormalOrNoEnum;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * <p>
@@ -17,4 +20,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class MessageMarkDao extends ServiceImpl<MessageMarkMapper, MessageMark>{
 
+    public List<MessageMark> getValidMarkByMsgIdBatch(List<Long> msgIds) {
+        return lambdaQuery()
+                .in(MessageMark::getMsgId, msgIds)
+                .eq(MessageMark::getStatus, NormalOrNoEnum.NORMAL.getStatus())
+                .list();
+    }
 }
