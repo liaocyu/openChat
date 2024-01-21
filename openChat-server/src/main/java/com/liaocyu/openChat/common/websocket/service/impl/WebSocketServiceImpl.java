@@ -6,16 +6,12 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.liaocyu.openChat.common.common.event.UserOnlineEvent;
 import com.liaocyu.openChat.common.user.dao.UserDao;
-import com.liaocyu.openChat.common.user.domain.entity.IpInfo;
 import com.liaocyu.openChat.common.user.domain.entity.User;
 import com.liaocyu.openChat.common.user.domain.enums.RoleEnum;
-import com.liaocyu.openChat.common.user.service.IRoleService;
-import com.liaocyu.openChat.common.user.service.IUserRoleService;
+import com.liaocyu.openChat.common.user.service.RoleService;
 import com.liaocyu.openChat.common.user.service.LoginService;
 import com.liaocyu.openChat.common.websocket.domian.dto.WSChannelExtraDTO;
-import com.liaocyu.openChat.common.websocket.domian.enums.WSRespTypeEnum;
 import com.liaocyu.openChat.common.websocket.domian.vo.resp.WSBaseResp;
-import com.liaocyu.openChat.common.websocket.domian.vo.resp.ws.WSLoginUrl;
 import com.liaocyu.openChat.common.websocket.service.WebSocketService;
 import com.liaocyu.openChat.common.websocket.service.adapter.WebSocketAdapter;
 import com.liaocyu.openChat.common.websocket.utils.NettyUtil;
@@ -24,7 +20,6 @@ import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.result.WxMpQrCodeTicket;
-import org.apache.catalina.core.ApplicationPushBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
@@ -64,7 +59,7 @@ public class WebSocketServiceImpl implements WebSocketService {
     ApplicationEventPublisher applicationEventPublisher;
 
     @Autowired
-    IRoleService roleService;
+    RoleService roleService;
 
     // 注入 webSocketExecutor 线程池配置
     @Qualifier("websocketExecutor")

@@ -34,5 +34,12 @@ public class UserBackpackServiceImplTest {
     }
 
 
+    @Test
+    void getUser() {
+        String login = loginService.login(10443L);
+        System.out.println(login);
+    }
+
+
 
 }

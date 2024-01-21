@@ -16,15 +16,21 @@ public class ChatMemberHelper {
     public static Pair<ChatActiveStatusEnum, String> getCursorPair(String cursor) {
         ChatActiveStatusEnum activeStatusEnum = ChatActiveStatusEnum.ONLINE;
         String timeCursor = null;
-        if (StrUtil.isNotBlank(cursor)) {
-            String activeStr = cursor.split(SEPARATOR)[0];
-            String timeStr = cursor.split(SEPARATOR)[1];
-            activeStatusEnum = ChatActiveStatusEnum.of(Integer.parseInt(activeStr));
+        if (StrUtil.isNotBlank(cursor)) { // 2_1698332821589
+            String activeStr = cursor.split(SEPARATOR)[0]; // 成员状态枚举值 1-在线 2-离线
+            String timeStr = cursor.split(SEPARATOR)[1]; // 时间戳
+            activeStatusEnum = ChatActiveStatusEnum.of(Integer.parseInt(activeStr)); // 根据status状态码返回相应的枚举值
             timeCursor = timeStr;
         }
-        return Pair.of(activeStatusEnum, timeCursor);
+        return Pair.of(activeStatusEnum, timeCursor); // 成员状态枚举值未作键  时间戳为值
     }
 
+    /**
+     *
+     * @param activeStatusEnum 成员在线状态
+     * @param timeCursor 时间戳
+     * @return 2_1698332821589
+     */
     public static String generateCursor(ChatActiveStatusEnum activeStatusEnum, String timeCursor) {
         return activeStatusEnum.getStatus() + SEPARATOR + timeCursor;
     }

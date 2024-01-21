@@ -2,7 +2,6 @@ package com.liaocyu.openChat.common.user.dao;
 
 import com.liaocyu.openChat.common.user.domain.entity.Role;
 import com.liaocyu.openChat.common.user.mapper.RoleMapper;
-import com.liaocyu.openChat.common.user.service.IRoleService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 

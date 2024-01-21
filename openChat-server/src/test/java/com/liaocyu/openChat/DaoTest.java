@@ -2,7 +2,6 @@ package com.liaocyu.openChat;
 
 import com.liaocyu.openChat.common.user.dao.UserDao;
 import com.liaocyu.openChat.common.user.domain.entity.User;
-import com.liaocyu.openChat.common.user.service.IUserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

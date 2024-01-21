@@ -10,7 +10,7 @@ import com.liaocyu.openChat.common.user.domain.enums.RoleEnum;
 import com.liaocyu.openChat.common.user.domain.vo.req.user.*;
 import com.liaocyu.openChat.common.user.domain.vo.resp.BadgeResp;
 import com.liaocyu.openChat.common.user.domain.vo.resp.UserInfoResp;
-import com.liaocyu.openChat.common.user.service.IRoleService;
+import com.liaocyu.openChat.common.user.service.RoleService;
 import com.liaocyu.openChat.common.user.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -37,7 +37,7 @@ public class UserController {
     private UserService userService;
 
     @Autowired
-    private IRoleService roleService;
+    private RoleService roleService;
 
     @GetMapping("userInfo")
     @ApiOperation("获取用户相关信息")

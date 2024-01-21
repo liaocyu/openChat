@@ -86,6 +86,13 @@ public class UserDao extends ServiceImpl<UserMapper, User> {
 
     }
 
+    /**
+     *
+     * @param memberUidList 群成员Uid列表
+     * @param request 游标实体请求 {pageSize ， cursor}
+     * @param online 在线状态 ONLINE
+     * @return 游标翻页
+     */
     public CursorPageBaseResp<User> getCursorPage(List<Long> memberUidList, CursorPageBaseReq request, ChatActiveStatusEnum online) {
         return CursorUtils.getCursorPageByMysql(this, request, wrapper -> {
             wrapper.eq(User::getActiveStatus, online.getStatus());//筛选上线或者离线的

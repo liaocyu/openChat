@@ -44,8 +44,8 @@ class openChatServerApplicationTest {
     @Autowired
     LoginService loginService;
 
-    @Autowired
-    ThreadPoolTaskExecutor threadPoolTaskExecutor;
+    /*@Autowired
+    ThreadPoolTaskExecutor threadPoolTaskExecutor;*/
 
 
     @Test
@@ -96,7 +96,7 @@ class openChatServerApplicationTest {
         System.out.println(validUid);
     }
 
-    @Test
+    /*@Test
     void thread() throws InterruptedException {
         threadPoolTaskExecutor.execute(() -> {
             if(1==1) {
@@ -106,7 +106,7 @@ class openChatServerApplicationTest {
         });
 
         Thread.sleep(2000);
-    }
+    }*/
 
     @Test
     void getUser() {

@@ -1,6 +1,12 @@
 package com.liaocyu.openChat.common.chat.controller;
 
 import com.liaocyu.openChat.common.chat.domain.vo.req.*;
+import com.liaocyu.openChat.common.chat.domain.vo.req.admin.AdminAddReq;
+import com.liaocyu.openChat.common.chat.domain.vo.req.admin.AdminRevokeReq;
+import com.liaocyu.openChat.common.chat.domain.vo.req.member.MemberAddReq;
+import com.liaocyu.openChat.common.chat.domain.vo.req.member.MemberDelReq;
+import com.liaocyu.openChat.common.chat.domain.vo.req.member.MemberExitReq;
+import com.liaocyu.openChat.common.chat.domain.vo.req.member.MemberReq;
 import com.liaocyu.openChat.common.chat.domain.vo.resp.ChatMemberListResp;
 import com.liaocyu.openChat.common.chat.domain.vo.resp.ChatMemberResp;
 import com.liaocyu.openChat.common.chat.domain.vo.resp.IdRespVO;

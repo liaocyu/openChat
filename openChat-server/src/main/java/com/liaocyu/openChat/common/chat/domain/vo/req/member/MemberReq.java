@@ -1,4 +1,4 @@
-package com.liaocyu.openChat.common.chat.domain.vo.req;
+package com.liaocyu.openChat.common.chat.domain.vo.req.member;
 
 import com.liaocyu.openChat.common.common.domain.vo.req.CursorPageBaseReq;
 import io.swagger.annotations.ApiModelProperty;

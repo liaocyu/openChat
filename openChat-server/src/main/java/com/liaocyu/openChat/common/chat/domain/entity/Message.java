@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import com.liaocyu.openChat.common.chat.domain.entity.msg.MessageExtra;
 import lombok.*;
 
 /**
@@ -60,9 +61,10 @@ public class Message implements Serializable {
 
     /**
      * 消息状态 0正常 1删除
+     *
+     * @see com.liaocyu.openChat.common.chat.domain.enums.MessageStatusEnum
      */
     @TableField("status")
-    @TableLogic(delval = "1" , value = "0")
     private Integer status;
 
     /**
@@ -73,6 +75,8 @@ public class Message implements Serializable {
 
     /**
      * 消息类型 1正常文本 2.撤回消息
+     *
+     * @see com.liaocyu.openChat.common.chat.domain.enums.MessageTypeEnum
      */
     @TableField("type")
     private Integer type;
@@ -81,7 +85,7 @@ public class Message implements Serializable {
      * 消息扩展字段
      */
     @TableField(value = "extra", typeHandler = JacksonTypeHandler.class)
-    private String extra;
+    private MessageExtra extra;
 
     /**
      * 创建时间

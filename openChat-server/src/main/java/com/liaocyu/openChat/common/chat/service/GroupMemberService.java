@@ -1,10 +1,8 @@
 package com.liaocyu.openChat.common.chat.service;
 
-import com.liaocyu.openChat.common.chat.domain.entity.GroupMember;
-import com.baomidou.mybatisplus.extension.service.IService;
-import com.liaocyu.openChat.common.chat.domain.vo.req.AdminAddReq;
-import com.liaocyu.openChat.common.chat.domain.vo.req.AdminRevokeReq;
-import com.liaocyu.openChat.common.chat.domain.vo.req.MemberExitReq;
+import com.liaocyu.openChat.common.chat.domain.vo.req.admin.AdminAddReq;
+import com.liaocyu.openChat.common.chat.domain.vo.req.admin.AdminRevokeReq;
+import com.liaocyu.openChat.common.chat.domain.vo.req.member.MemberExitReq;
 
 /**
  * <p>

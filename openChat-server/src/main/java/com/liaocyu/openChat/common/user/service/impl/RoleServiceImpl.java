@@ -1,7 +1,7 @@
 package com.liaocyu.openChat.common.user.service.impl;
 
 import com.liaocyu.openChat.common.user.domain.enums.RoleEnum;
-import com.liaocyu.openChat.common.user.service.IRoleService;
+import com.liaocyu.openChat.common.user.service.RoleService;
 import com.liaocyu.openChat.common.user.service.cache.UserCache;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,7 +15,7 @@ import java.util.Set;
  * @description :
  */
 @Service
-public class RoleServiceImpl implements IRoleService {
+public class RoleServiceImpl implements RoleService {
 
     private final UserCache userCache;
 

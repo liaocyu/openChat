@@ -10,7 +10,7 @@ import java.util.Date;
 
 /**
  * Description: 消息
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
+ * Author: <a href="https://github.com/liaocyu">liaocyu</a>
  * Date: 2023-03-23
  */
 @Data
@@ -40,7 +40,7 @@ public class ChatMessageResp {
         private Date sendTime;
         @ApiModelProperty("消息类型 1正常文本 2.撤回消息")
         private Integer type;
-        @ApiModelProperty("消息内容不同的消息类型，内容体不同，见https://www.yuque.com/snab/mallcaht/rkb2uz5k1qqdmcmd")
+        @ApiModelProperty("消息内容不同的消息类型")
         private Object body;
         @ApiModelProperty("消息标记")
         private MessageMark messageMark;

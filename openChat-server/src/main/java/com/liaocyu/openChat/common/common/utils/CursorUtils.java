@@ -21,14 +21,22 @@ import java.util.stream.Collectors;
 
 /**
  * Description: 游标分页工具类
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
+ * Author: <a href="https://github.com/liaocyu">liaocyu</a>
  * Date: 2023-03-28
  */
 public class CursorUtils {
 
+    /**
+     *
+     * @param cursorPageBaseReq 游标翻页请求体 {pageSize = 10 , curson}
+     * @param redisKey
+     * @param typeConvert
+     * @return
+     * @param <T> 传入进来的泛型
+     */
     public static <T> CursorPageBaseResp<Pair<T, Double>> getCursorPageByRedis(CursorPageBaseReq cursorPageBaseReq, String redisKey, Function<String, T> typeConvert) {
         Set<ZSetOperations.TypedTuple<String>> typedTuples;
-        if (StrUtil.isBlank(cursorPageBaseReq.getCursor())) {//第一次
+        if (StrUtil.isBlank(cursorPageBaseReq.getCursor())) {//第一次  判断传入进来的游标是否为空
             typedTuples = RedisUtils.zReverseRangeWithScores(redisKey, cursorPageBaseReq.getPageSize());
         } else {
             typedTuples = RedisUtils.zReverseRangeByScoreWithScores(redisKey, Double.parseDouble(cursorPageBaseReq.getCursor()), cursorPageBaseReq.getPageSize());
@@ -47,12 +55,12 @@ public class CursorUtils {
     }
 
     /**
-     * @param mapper
-     * @param request
-     * @param initWrapper
-     * @param cursorColumn
+     * @param mapper 查询 mapper
+     * @param request 游标翻页请求实体
+     * @param initWrapper MP条件构造器
+     * @param cursorColumn 游标字段类型
      * @return
-     * @param <T>
+     * @param <T> 传入的泛型，传入的查询数据库表实体映射类
      */
     public static <T> CursorPageBaseResp<T> getCursorPageByMysql(IService<T> mapper, CursorPageBaseReq request, Consumer<LambdaQueryWrapper<T>> initWrapper, SFunction<T, ?> cursorColumn) {
         //游标字段类型
@@ -64,7 +72,7 @@ public class CursorUtils {
         if (StrUtil.isNotBlank(request.getCursor())) {
             wrapper.lt(cursorColumn, parseCursor(request.getCursor(), cursorType));
         }
-        //游标方向
+        //游标方向 根据游标字段类型逆向排序
         wrapper.orderByDesc(cursorColumn);
 
         Page<T> page = mapper.page(request.plusPage(), wrapper);

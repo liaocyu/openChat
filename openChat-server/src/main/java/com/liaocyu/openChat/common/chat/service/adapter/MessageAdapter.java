@@ -3,6 +3,8 @@ package com.liaocyu.openChat.common.chat.service.adapter;
 import cn.hutool.core.bean.BeanUtil;
 import com.liaocyu.openChat.common.chat.domain.entity.Message;
 import com.liaocyu.openChat.common.chat.domain.entity.MessageMark;
+import com.liaocyu.openChat.common.chat.domain.enums.MessageStatusEnum;
+import com.liaocyu.openChat.common.chat.domain.vo.req.ChatMessageReq;
 import com.liaocyu.openChat.common.chat.domain.vo.resp.ChatMessageResp;
 
 import java.util.*;
@@ -12,7 +14,7 @@ import java.util.stream.Collectors;
  * @author : create by lcy
  * @Project : openChat
  * @createTime : 2024/1/17 11:27
- * @description :
+ * @description : TODO 消息适配器
  */
 public class MessageAdapter {
     public static final int CAN_CALLBACK_GAP_COUNT = 100;
@@ -48,5 +50,14 @@ public class MessageAdapter {
         ChatMessageResp.UserInfo userInfo = new ChatMessageResp.UserInfo();
         userInfo.setUid(fromUid);
         return userInfo;
+    }
+
+    public static Message buildMsgSave(ChatMessageReq request, Long uid) {
+        return Message.builder()
+                .fromUid(uid)
+                .roomId(request.getRoomId())
+                .type(request.getMsgType())
+                .status(MessageStatusEnum.NORMAL.getStatus())
+                .build();
     }
 }

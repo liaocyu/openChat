@@ -25,14 +25,15 @@ public class CursorPageBaseReq {
     private Integer pageSize = 10;
 
     @ApiModelProperty("游标（初始为null，后续请求附带上次翻页的游标）")
-    private String cursor;
+    private String cursor; // 这里的游标是时间戳
 
+    // Page: MyBatisPlus 中的Page
     public Page plusPage() {
-        return new Page(1, this.pageSize);
+        return new Page(1, this.pageSize); // 构造一个Page ：当前页为1 页大小为 10
     }
 
     @JsonIgnore
     public Boolean isFirstPage() {
-        return StringUtils.isEmpty(cursor);
+        return StringUtils.isEmpty(cursor); // 利用游标是否为空来判断是否是最后一页
     }
 }

@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
  * @author : create by lcy
  * @Project : openChat
  * @createTime : 2024/1/9 16:17
- * @description :
+ * @description : redis string类型的批量缓存框架
  */
 public abstract class AbstractRedisStringCache<IN , OUT> implements BatchCache<IN , OUT>{
 
@@ -20,7 +20,7 @@ public abstract class AbstractRedisStringCache<IN , OUT> implements BatchCache<I
 
     protected AbstractRedisStringCache() {
         ParameterizedType genericSuperclass = (ParameterizedType) this.getClass().getGenericSuperclass();
-        this.outClass = (Class<OUT>) genericSuperclass.getActualTypeArguments()[1];
+        this.outClass = (Class<OUT>) genericSuperclass.getActualTypeArguments()[1]; // 加载传入进来的OUT的类型
     }
 
     protected abstract String getKey(IN req);

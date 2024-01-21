@@ -26,7 +26,7 @@ import javax.validation.Valid;
  */
 @RestController
 @RequestMapping("/capi/chat")
-@Api(tags = "聊天室相关接口")
+@Api(tags = "会话相关接口")
 @Slf4j
 public class ContactController {
 
@@ -37,7 +37,7 @@ public class ContactController {
         this.roomAppService = roomAppService;
     }
 
-    @GetMapping("/public/contact/page")
+    @GetMapping("public/contact/page")
     @ApiOperation("会话列表")
     public ApiResult<CursorPageBaseResp<ChatRoomResp>> getRoomPage(@Valid CursorPageBaseReq request) {
         Long uid = RequestHolder.get().getUid();

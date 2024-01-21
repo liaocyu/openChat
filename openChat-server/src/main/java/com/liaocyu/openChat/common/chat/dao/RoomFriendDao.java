@@ -16,7 +16,7 @@ import java.util.List;
  * @author <a href="https://github.com/liaocyu">liaocyu</a>
  * @since 2024-01-03
  */
-@Service
+@Service("roomFriendDao")
 public class RoomFriendDao extends ServiceImpl<RoomFriendMapper, RoomFriend> {
 
     public RoomFriend getByKey(String key) {

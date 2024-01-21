@@ -22,21 +22,28 @@ import java.util.List;
  * @author <a href="https://github.com/liaocyu">liaocyu</a>
  * @since 2024-01-03
  */
-@Service
+@Service("contactDao")
 public class ContactDao extends ServiceImpl<ContactMapper, Contact> {
+    public Contact get(Long uid, Long roomId) {
+        return lambdaQuery()
+                .eq(Contact::getUid, uid)
+                .eq(Contact::getRoomId, roomId)
+                .one();
+    }
+
 
     /**
      * 根据房间Id 删除会话
      *
-     * @param roomId 房间Id
+     * @param roomId  房间Id
      * @param uidList 群成员列表
      * @return 是否删除成功
      */
-    public Boolean removeByRoomId(Long roomId , List<Long> uidList) {
+    public Boolean removeByRoomId(Long roomId, List<Long> uidList) {
         if (CollectionUtil.isNotEmpty(uidList)) {
             LambdaQueryWrapper<Contact> wrapper = new QueryWrapper<Contact>().lambda()
-                    .eq(Contact::getRoomId , roomId)
-                    .in(Contact::getUid , uidList);
+                    .eq(Contact::getRoomId, roomId)
+                    .in(Contact::getUid, uidList);
             return this.remove(wrapper);
         }
         return false;
@@ -53,6 +60,7 @@ public class ContactDao extends ServiceImpl<ContactMapper, Contact> {
 
     /**
      * 更新所有群成员会话时间
+     *
      * @param roomId
      * @param memberUidList
      * @param msgId

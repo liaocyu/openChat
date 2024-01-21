@@ -8,6 +8,9 @@ import com.liaocyu.openChat.common.chat.domain.enums.GroupRoleAPPEnum;
 import com.liaocyu.openChat.common.chat.domain.enums.GroupRoleEnum;
 import com.liaocyu.openChat.common.chat.domain.enums.HotFlagEnum;
 import com.liaocyu.openChat.common.chat.domain.vo.req.*;
+import com.liaocyu.openChat.common.chat.domain.vo.req.member.MemberAddReq;
+import com.liaocyu.openChat.common.chat.domain.vo.req.member.MemberDelReq;
+import com.liaocyu.openChat.common.chat.domain.vo.req.member.MemberReq;
 import com.liaocyu.openChat.common.chat.domain.vo.resp.ChatMemberListResp;
 import com.liaocyu.openChat.common.chat.domain.vo.resp.ChatMemberResp;
 import com.liaocyu.openChat.common.chat.domain.vo.resp.ChatRoomResp;
@@ -30,8 +33,7 @@ import com.liaocyu.openChat.common.common.utils.AssertUtil;
 import com.liaocyu.openChat.common.user.dao.UserDao;
 import com.liaocyu.openChat.common.user.domain.entity.User;
 import com.liaocyu.openChat.common.user.domain.enums.RoleEnum;
-import com.liaocyu.openChat.common.user.service.IRoleService;
-import com.liaocyu.openChat.common.user.service.adapter.FriendAdapter;
+import com.liaocyu.openChat.common.user.service.RoleService;
 import com.liaocyu.openChat.common.user.service.cache.UserCache;
 import com.liaocyu.openChat.common.user.service.cache.UserInfoCache;
 import com.liaocyu.openChat.common.websocket.domian.vo.resp.WSBaseResp;
@@ -70,7 +72,7 @@ public class RoomAppServiceImpl implements RoomAppService {
     @Autowired
     private UserDao userDao;
     @Autowired
-    private IRoleService roleService;
+    private RoleService roleService;
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
     @Autowired
@@ -268,11 +270,12 @@ public class RoomAppServiceImpl implements RoomAppService {
     public List<ChatMemberListResp> getMemberList(ChatMessageMemberReq request) {
         Room room = roomCache.get(request.getRoomId());
         AssertUtil.isNotEmpty(room, "房间号有误");
-        if (isHotGroup(room)) {// 全员群展示所有用户100名
+        if (isHotGroup(room)) {// 全员群展示所有用户100名 因为全员群只有一个 不需要传入参数
             List<User> memberList = userDao.getMemberList();
             return MemberAdapter.buildMemberList(memberList);
         } else {
             RoomGroup roomGroup = roomGroupCache.get(request.getRoomId());
+            AssertUtil.isNotEmpty(roomGroup , "群里聊房间错误");
             List<Long> memberUidList = groupMemberDao.getMemberUidList(roomGroup.getId());
             Map<Long, User> batch = userInfoCache.getBatch(memberUidList);
             return MemberAdapter.buildMemberList(batch);

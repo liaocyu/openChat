@@ -1,7 +1,5 @@
 package com.liaocyu.openChat.common.user.service;
 
-import com.liaocyu.openChat.common.user.domain.entity.Role;
-import com.baomidou.mybatisplus.extension.service.IService;
 import com.liaocyu.openChat.common.user.domain.enums.RoleEnum;
 
 /**
@@ -12,7 +10,7 @@ import com.liaocyu.openChat.common.user.domain.enums.RoleEnum;
  * @author <a href="https://github.com/liaocyu">liaocyu</a>
  * @since 2023-12-28
  */
-public interface IRoleService {
+public interface RoleService {
 
     /**
      * 是否拥有某个权限
