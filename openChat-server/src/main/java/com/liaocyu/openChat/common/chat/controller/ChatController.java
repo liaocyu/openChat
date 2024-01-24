@@ -1,8 +1,8 @@
 package com.liaocyu.openChat.common.chat.controller;
 
-import com.liaocyu.openChat.common.chat.domain.vo.req.ChatMessageMarkReq;
-import com.liaocyu.openChat.common.chat.domain.vo.req.ChatMessagePageReq;
-import com.liaocyu.openChat.common.chat.domain.vo.req.ChatMessageReq;
+import com.liaocyu.openChat.common.chat.domain.dto.MsgReadInfoDTO;
+import com.liaocyu.openChat.common.chat.domain.vo.req.*;
+import com.liaocyu.openChat.common.chat.domain.vo.resp.ChatMessageReadResp;
 import com.liaocyu.openChat.common.chat.domain.vo.resp.ChatMessageResp;
 import com.liaocyu.openChat.common.chat.service.ChatService;
 import com.liaocyu.openChat.common.common.domain.vo.resp.ApiResult;
@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -88,6 +89,36 @@ public class ChatController {
     // TODO 频控注解 @FrequencyControl(time = 10, count = 5, target = FrequencyControl.Target.UID)
     public ApiResult<Void> setMsgMark(@Valid @RequestBody ChatMessageMarkReq request) {
         chatService.setMsgMark(RequestHolder.get().getUid(), request);
+        return ApiResult.success();
+    }
+
+    @PutMapping("msg/recall")
+    @ApiOperation("撤回消息")
+    // TODO 频控注解 @FrequencyControl(time = 20, count = 3, target = FrequencyControl.Target.UID)
+    public ApiResult<Void> recallMsg(@Valid @RequestBody ChatMessageBaseReq request) {
+        chatService.recallMsg(RequestHolder.get().getUid(), request);
+        return ApiResult.success();
+    }
+
+    @GetMapping("msg/read/page")
+    @ApiOperation("消息的已读未读列表")
+    public ApiResult<CursorPageBaseResp<ChatMessageReadResp>> getReadPage(@Valid ChatMessageReadReq request) {
+        Long uid = RequestHolder.get().getUid();
+        return ApiResult.success(chatService.getReadPage(uid, request));
+    }
+
+    @GetMapping("msg/read")
+    @ApiOperation("获取消息的已读未读总数")
+    public ApiResult<Collection<MsgReadInfoDTO>> getReadInfo(@Valid ChatMessageReadInfoReq request) {
+        Long uid = RequestHolder.get().getUid();
+        return ApiResult.success(chatService.getMsgReadInfo(uid, request));
+    }
+
+    @PutMapping("msg/read")
+    @ApiOperation("消息阅读上报")
+    public ApiResult<Void> msgRead(@Valid @RequestBody ChatMessageMemberReq request) {
+        Long uid = RequestHolder.get().getUid();
+        chatService.msgRead(uid, request);
         return ApiResult.success();
     }
 

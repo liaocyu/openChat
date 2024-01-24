@@ -1,9 +1,15 @@
 package com.liaocyu.openChat.common.chat.service.strategy.mark;
 
 import com.liaocyu.openChat.common.chat.dao.MessageMarkDao;
+import com.liaocyu.openChat.common.chat.domain.dto.ChatMessageMarkDTO;
 import com.liaocyu.openChat.common.chat.domain.entity.MessageMark;
+import com.liaocyu.openChat.common.chat.domain.enums.MessageMarkActTypeEnum;
+import com.liaocyu.openChat.common.chat.domain.enums.MessageMarkTypeEnum;
 import com.liaocyu.openChat.common.common.domain.enums.YesOrNoEnum;
+import com.liaocyu.openChat.common.common.event.MessageMarkEvent;
 import com.liaocyu.openChat.common.common.exception.BusinessException;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,23 +22,44 @@ import java.util.Optional;
  * @author : create by lcy
  * @Project : openChat
  * @createTime : 2024/1/21 16:16
- * @description : TODO 消息标记抽象类
+ * @description : 消息标记抽象类
  */
-/*
-
+@NoArgsConstructor
 public abstract class AbstractMsgMarkStrategy {
-    @Autowired
-    private MessageMarkDao messageMarkDao;
-    @Autowired
-    private ApplicationEventPublisher applicationEventPublisher;
 
+    // TODO 这里也许可能会有问题
+    private MessageMarkDao messageMarkDao;
+    private ApplicationEventPublisher applicationEventPublisher;
+    @Autowired
+    public AbstractMsgMarkStrategy(MessageMarkDao messageMarkDao  , ApplicationEventPublisher applicationEventPublisher) {
+        this.messageMarkDao = messageMarkDao;
+        this.applicationEventPublisher = applicationEventPublisher;
+    }
+
+    /**
+     * 消息类型
+     *
+     * @return 返回消息类型
+     */
     protected abstract MessageMarkTypeEnum getTypeEnum();
 
+    /**
+     * 消息标记
+     *
+     * @param uid uid
+     * @param msgId 消息Id
+     */
     @Transactional
     public void mark(Long uid, Long msgId) {
         doMark(uid, msgId);
     }
 
+    /**
+     * 消息标记取消
+     *
+     * @param uid uid
+     * @param msgId 消息Id
+     */
     @Transactional
     public void unMark(Long uid, Long msgId) {
         doUnMark(uid, msgId);
@@ -85,5 +112,4 @@ public abstract class AbstractMsgMarkStrategy {
     }
 
 }
-*/
 

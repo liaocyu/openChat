@@ -17,4 +17,34 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.liaocyu</groupId>
+            <artifactId>openChat-common-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.minio</groupId>
+            <artifactId>minio</artifactId>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.4.3</version>
+            </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <!-- 取消查找本项目下的Main方法：为了解决Unable to find main class的问题 -->
+                    <mainClass>none</mainClass>
+                    <!-- 解决maven-plugin插件打的Jar包可以运行，但依赖方打包找不到此模块中的类或属性的问题(程序包xxx不存在) -->
+                    <classifier>execute</classifier>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
 </project>

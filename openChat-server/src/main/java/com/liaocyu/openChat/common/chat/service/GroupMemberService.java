@@ -36,4 +36,5 @@ public interface GroupMemberService {
      * @param request 请求信息
      */
     void revokeAdmin(Long uid, AdminRevokeReq request);
+
 }

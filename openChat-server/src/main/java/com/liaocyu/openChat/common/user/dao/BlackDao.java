@@ -2,7 +2,6 @@ package com.liaocyu.openChat.common.user.dao;
 
 import com.liaocyu.openChat.common.user.domain.entity.Black;
 import com.liaocyu.openChat.common.user.mapper.BlackMapper;
-import com.liaocyu.openChat.common.user.service.IBlackService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 

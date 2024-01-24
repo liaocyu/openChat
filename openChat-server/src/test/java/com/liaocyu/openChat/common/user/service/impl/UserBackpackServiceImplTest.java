@@ -2,7 +2,7 @@ package com.liaocyu.openChat.common.user.service.impl;
 
 import com.liaocyu.openChat.common.user.domain.enums.IdempotentEnum;
 import com.liaocyu.openChat.common.user.domain.enums.ItemEnum;
-import com.liaocyu.openChat.common.user.service.IUserBackpackService;
+import com.liaocyu.openChat.common.user.service.UserBackpackService;
 import com.liaocyu.openChat.common.user.service.LoginService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,11 +19,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class UserBackpackServiceImplTest {
 
     private final LoginService loginService;
-    private final IUserBackpackService userBackpackService;
+    private final UserBackpackService userBackpackService;
 
     @Autowired
     public UserBackpackServiceImplTest(LoginService loginService ,
-                                       IUserBackpackService userBackpackService) {
+                                       UserBackpackService userBackpackService) {
         this.loginService = loginService;
         this.userBackpackService = userBackpackService;
     }

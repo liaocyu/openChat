@@ -14,7 +14,7 @@ import java.util.Set;
  * @createTime : 2023/12/28 11:21
  * @description :
  */
-@Service
+@Service("roleService")
 public class RoleServiceImpl implements RoleService {
 
     private final UserCache userCache;

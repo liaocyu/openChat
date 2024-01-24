@@ -1,6 +1,6 @@
 package com.liaocyu.openChat.common.user.service.impl;
 
-import com.liaocyu.openChat.common.user.service.IUserApplyService;
+import com.liaocyu.openChat.common.user.service.UserApplyService;
 import org.springframework.stereotype.Service;
 
 /**
@@ -10,5 +10,5 @@ import org.springframework.stereotype.Service;
  * @description :
  */
 @Service
-public class UserApplyServiceImpl implements IUserApplyService {
+public class UserApplyServiceImpl implements UserApplyService {
 }

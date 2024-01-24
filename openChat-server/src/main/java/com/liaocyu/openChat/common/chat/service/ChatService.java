@@ -1,15 +1,16 @@
 package com.liaocyu.openChat.common.chat.service;
 
+import com.liaocyu.openChat.common.chat.domain.dto.MsgReadInfoDTO;
 import com.liaocyu.openChat.common.chat.domain.entity.Message;
-import com.liaocyu.openChat.common.chat.domain.vo.req.ChatMessageMarkReq;
-import com.liaocyu.openChat.common.chat.domain.vo.req.ChatMessagePageReq;
-import com.liaocyu.openChat.common.chat.domain.vo.req.ChatMessageReq;
+import com.liaocyu.openChat.common.chat.domain.vo.req.*;
 import com.liaocyu.openChat.common.chat.domain.vo.req.member.MemberReq;
 import com.liaocyu.openChat.common.chat.domain.vo.resp.ChatMemberResp;
+import com.liaocyu.openChat.common.chat.domain.vo.resp.ChatMessageReadResp;
 import com.liaocyu.openChat.common.chat.domain.vo.resp.ChatMessageResp;
 import com.liaocyu.openChat.common.common.domain.vo.resp.CursorPageBaseResp;
 
 import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -48,4 +49,25 @@ public interface ChatService {
     Long sendMsg(ChatMessageReq request, Long uid);
 
     void setMsgMark(Long uid, ChatMessageMarkReq request);
+
+    /**
+     * 撤回消息
+     *
+     * @param uid uid
+     * @param request ChatMessageBaseReq(msgId , roomId)
+     */
+    void recallMsg(Long uid, ChatMessageBaseReq request);
+
+    CursorPageBaseResp<ChatMessageReadResp> getReadPage(Long uid, ChatMessageReadReq request);
+
+    /**
+     * 获取已读消息的条数
+     *
+     * @param uid uid
+     * @param request ChatMessageReadInfoReq(List<Long> msgIds)
+     * @return
+     */
+    Collection<MsgReadInfoDTO> getMsgReadInfo(Long uid, ChatMessageReadInfoReq request);
+
+    void msgRead(Long uid, ChatMessageMemberReq request);
 }

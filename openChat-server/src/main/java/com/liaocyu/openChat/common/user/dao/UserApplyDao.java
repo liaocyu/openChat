@@ -6,7 +6,6 @@ import com.liaocyu.openChat.common.user.domain.entity.UserApply;
 import com.liaocyu.openChat.common.user.domain.enums.ApplyStatusEnum;
 import com.liaocyu.openChat.common.user.domain.enums.ApplyTypeEnum;
 import com.liaocyu.openChat.common.user.mapper.UserApplyMapper;
-import com.liaocyu.openChat.common.user.service.IUserApplyService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 

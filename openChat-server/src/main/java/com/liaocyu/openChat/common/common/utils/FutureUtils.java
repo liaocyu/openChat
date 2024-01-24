@@ -12,7 +12,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
- * 美团的CompletableFuture封装工具类，参考文章https://mp.weixin.qq.com/s/GQGidprakfticYnbVYVYGQ
+ * 美团的CompletableFuture封装工具类，参考文章 https://mp.weixin.qq.com/s/GQGidprakfticYnbVYVYGQ
  */
 @Slf4j
 public class FutureUtils {

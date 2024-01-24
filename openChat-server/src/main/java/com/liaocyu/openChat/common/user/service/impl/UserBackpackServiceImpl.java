@@ -3,21 +3,17 @@ package com.liaocyu.openChat.common.user.service.impl;
 import com.liaocyu.openChat.common.common.annotation.RedissonLock;
 import com.liaocyu.openChat.common.common.domain.enums.YesOrNoEnum;
 import com.liaocyu.openChat.common.common.service.LockService;
-import com.liaocyu.openChat.common.common.utils.AssertUtil;
 import com.liaocyu.openChat.common.user.dao.UserBackpackDao;
 import com.liaocyu.openChat.common.user.domain.entity.UserBackpack;
 import com.liaocyu.openChat.common.user.domain.enums.IdempotentEnum;
-import com.liaocyu.openChat.common.user.service.IUserBackpackService;
-import org.redisson.api.RLock;
+import com.liaocyu.openChat.common.user.service.UserBackpackService;
 import org.redisson.api.RedissonClient;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.cache.CacheProperties;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author : create by lcy
@@ -25,8 +21,8 @@ import java.util.concurrent.TimeUnit;
  * @createTime : 2023/12/25 10:58
  * @description :
  */
-@Service
-public class UserBackpackServiceImpl implements IUserBackpackService {
+@Service("userBackpackService")
+public class UserBackpackServiceImpl implements UserBackpackService {
 
     private final RedissonClient redissonClient;
     private final UserBackpackDao userBackpackDao;

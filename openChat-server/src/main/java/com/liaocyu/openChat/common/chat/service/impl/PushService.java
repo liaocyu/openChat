@@ -15,7 +15,7 @@ import java.util.List;
  * @createTime : 2024/1/15 17:30
  * @description :
  */
-@Service
+@Service("pushService")
 public class PushService {
     @Autowired
     private MQProducer mqProducer;

@@ -5,7 +5,6 @@ import com.liaocyu.openChat.common.common.domain.vo.resp.CursorPageBaseResp;
 import com.liaocyu.openChat.common.common.utils.CursorUtils;
 import com.liaocyu.openChat.common.user.domain.entity.UserFriend;
 import com.liaocyu.openChat.common.user.mapper.UserFriendMapper;
-import com.liaocyu.openChat.common.user.service.IUserFriendService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 

@@ -2,7 +2,6 @@ package com.liaocyu.openChat.common.user.dao;
 
 import com.liaocyu.openChat.common.user.domain.entity.ItemConfig;
 import com.liaocyu.openChat.common.user.mapper.ItemConfigMapper;
-import com.liaocyu.openChat.common.user.service.IItemConfigService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 

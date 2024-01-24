@@ -16,7 +16,7 @@ import lombok.EqualsAndHashCode;
 
 /**
  * <p>
- * 会话列表
+ * 会话表
  * </p>
  *
  * @author <a href="https://github.com/liaocyu">liaocyu</a>
@@ -51,13 +51,13 @@ public class Contact implements Serializable {
      * 阅读到的时间
      */
     @TableField("read_time")
-    private LocalDateTime readTime;
+    private Date readTime;
 
     /**
      * 会话内消息最后更新的时间(只有普通会话需要维护，全员会话不需要维护)
      */
     @TableField("active_time")
-    private LocalDateTime activeTime;
+    private Date activeTime;
 
     /**
      * 会话最新消息id
