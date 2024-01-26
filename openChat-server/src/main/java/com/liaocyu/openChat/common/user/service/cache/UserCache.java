@@ -2,7 +2,7 @@ package com.liaocyu.openChat.common.user.service.cache;
 
 import cn.hutool.core.collection.CollUtil;
 import com.liaocyu.openChat.common.common.constant.RedisKey;
-import com.liaocyu.openChat.common.common.utils.RedisUtils;
+import com.liaocyu.openchat.utils.RedisUtils;
 import com.liaocyu.openChat.common.user.dao.BlackDao;
 import com.liaocyu.openChat.common.user.dao.UserDao;
 import com.liaocyu.openChat.common.user.dao.UserRoleDao;
@@ -90,7 +90,7 @@ public class UserCache {
     /**
      * 获取用户信息，盘路缓存模式
      */
-    public User getUserInfo(Long uid) {//todo 后期做二级缓存
+    public User getUserInfo(Long uid) {//todo 后期做二级缓存✔
         return getUserInfoBatch(Collections.singleton(uid)).get(uid);
     }
 
@@ -114,5 +114,15 @@ public class UserCache {
             map.putAll(needLoadUserList.stream().collect(Collectors.toMap(User::getId, Function.identity())));
         }
         return map;
+    }
+
+    //用户下线
+    public void offline(Long uid, Date optTime) {
+        String onlineKey = RedisKey.getKey(RedisKey.ONLINE_UID_ZET);
+        String offlineKey = RedisKey.getKey(RedisKey.OFFLINE_UID_ZET);
+        //移除上线线表
+        RedisUtils.zRemove(onlineKey, uid);
+        //更新上线表
+        RedisUtils.zAdd(offlineKey, uid, optTime.getTime());
     }
 }

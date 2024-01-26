@@ -1,13 +1,20 @@
 package com.liaocyu.openChat.common.user.service.adapter;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.liaocyu.openChat.common.chat.domain.dto.ChatMessageMarkDTO;
 import com.liaocyu.openChat.common.chat.domain.dto.ChatMsgRecallDTO;
+import com.liaocyu.openChat.common.chat.domain.vo.resp.ChatMemberResp;
+import com.liaocyu.openChat.common.chat.domain.vo.resp.ChatMemberStatisticResp;
+import com.liaocyu.openChat.common.chat.domain.vo.resp.ChatMessageResp;
 import com.liaocyu.openChat.common.chat.service.ChatService;
+import com.liaocyu.openChat.common.user.domain.entity.User;
+import com.liaocyu.openChat.common.websocket.domian.enums.ChatActiveStatusEnum;
 import com.liaocyu.openChat.common.websocket.domian.enums.WSRespTypeEnum;
 import com.liaocyu.openChat.common.websocket.domian.vo.resp.WSBaseResp;
 import com.liaocyu.openChat.common.websocket.domian.vo.resp.ws.WSFriendApply;
 import com.liaocyu.openChat.common.websocket.domian.vo.resp.ws.WSMsgMark;
 import com.liaocyu.openChat.common.websocket.domian.vo.resp.ws.WSMsgRecall;
+import com.liaocyu.openChat.common.websocket.domian.vo.resp.ws.WSOnlineOfflineNotify;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -55,5 +62,36 @@ public class WSAdapter {
         BeanUtils.copyProperties(recallDTO, recall);
         wsBaseResp.setData(recall);
         return wsBaseResp;
+    }
+
+    public static WSBaseResp<ChatMessageResp> buildMsgSend(ChatMessageResp msgResp) {
+        WSBaseResp<ChatMessageResp> wsBaseResp = new WSBaseResp<>();
+        wsBaseResp.setType(WSRespTypeEnum.MESSAGE.getType());
+        wsBaseResp.setData(msgResp);
+        return wsBaseResp;
+    }
+
+    private void assembleNum(WSOnlineOfflineNotify onlineOfflineNotify) {
+        ChatMemberStatisticResp memberStatistic = chatService.getMemberStatistic();
+        onlineOfflineNotify.setOnlineNum(memberStatistic.getOnlineNum());
+    }
+
+    public WSBaseResp<WSOnlineOfflineNotify> buildOfflineNotifyResp(User user) {
+        WSBaseResp<WSOnlineOfflineNotify> wsBaseResp = new WSBaseResp<>();
+        wsBaseResp.setType(WSRespTypeEnum.ONLINE_OFFLINE_NOTIFY.getType());
+        WSOnlineOfflineNotify onlineOfflineNotify = new WSOnlineOfflineNotify();
+        onlineOfflineNotify.setChangeList(Collections.singletonList(buildOfflineInfo(user)));
+        assembleNum(onlineOfflineNotify);
+        wsBaseResp.setData(onlineOfflineNotify);
+        return wsBaseResp;
+    }
+
+    private static ChatMemberResp buildOfflineInfo(User user) {
+        ChatMemberResp info = new ChatMemberResp();
+        BeanUtil.copyProperties(user, info);
+        info.setUid(user.getId());
+        info.setActiveStatus(ChatActiveStatusEnum.OFFLINE.getStatus());
+        info.setLastOptTime(user.getLastOptTime());
+        return info;
     }
 }

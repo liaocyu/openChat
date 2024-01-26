@@ -1,7 +1,6 @@
-package com.liaocyu.openChat.common.common.utils;
+package com.liaocyu.openchat.utils;
 
 import cn.hutool.extra.spring.SpringUtil;
-import com.liaocyu.openchat.utils.JsonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;

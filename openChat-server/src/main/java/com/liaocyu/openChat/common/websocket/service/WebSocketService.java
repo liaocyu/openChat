@@ -1,6 +1,7 @@
 package com.liaocyu.openChat.common.websocket.service;
 
 import com.liaocyu.openChat.common.websocket.domian.vo.resp.WSBaseResp;
+import com.liaocyu.openChat.common.websocket.domian.vo.resp.ws.WSOnlineOfflineNotify;
 import io.netty.channel.Channel;
 
 /**
@@ -19,6 +20,11 @@ public interface WebSocketService {
      */
     void handleLoginReq(Channel channel);
 
+    /**
+     * 处理ws断开连接的事件
+     *
+     * @param channel
+     */
     void remove(Channel channel);
 
     void scanLoginSuccess(Integer code, Long id);
@@ -38,4 +44,11 @@ public interface WebSocketService {
     void authorize(Channel channel, String token);
 
     void sendMsgToAll(WSBaseResp<?> msg);
-}
+
+    /**
+     * 推动消息给所有在线的人
+     *
+     * @param wsBaseResp 发送的消息体
+     * @param skipUid    需要跳过的人
+     */
+    void sendToAllOnline(WSBaseResp<?> wsBaseResp, Long skipUid);}

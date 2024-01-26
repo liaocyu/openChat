@@ -12,9 +12,7 @@ import com.liaocyu.openChat.common.chat.domain.enums.MessageMarkActTypeEnum;
 import com.liaocyu.openChat.common.chat.domain.enums.MessageTypeEnum;
 import com.liaocyu.openChat.common.chat.domain.vo.req.*;
 import com.liaocyu.openChat.common.chat.domain.vo.req.member.MemberReq;
-import com.liaocyu.openChat.common.chat.domain.vo.resp.ChatMemberResp;
-import com.liaocyu.openChat.common.chat.domain.vo.resp.ChatMessageReadResp;
-import com.liaocyu.openChat.common.chat.domain.vo.resp.ChatMessageResp;
+import com.liaocyu.openChat.common.chat.domain.vo.resp.*;
 import com.liaocyu.openChat.common.chat.service.ChatService;
 import com.liaocyu.openChat.common.chat.service.adapter.MemberAdapter;
 import com.liaocyu.openChat.common.chat.service.adapter.MessageAdapter;
@@ -38,9 +36,12 @@ import com.liaocyu.openChat.common.user.domain.entity.User;
 import com.liaocyu.openChat.common.user.domain.enums.RoleEnum;
 import com.liaocyu.openChat.common.user.service.ContactService;
 import com.liaocyu.openChat.common.user.service.RoleService;
+import com.liaocyu.openChat.common.user.service.cache.UserCache;
 import com.liaocyu.openChat.common.websocket.domian.enums.ChatActiveStatusEnum;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -74,6 +75,7 @@ public class ChatServiceImpl implements ChatService {
     private final RoleService roleService;
     private final RecallMsgHandler recallMsgHandler;
     private final ContactService contactService;
+    private final UserCache userCache;
 
     @Autowired
     public ChatServiceImpl(UserDao userDao , RoomGroupDao roomGroupDao ,
@@ -82,7 +84,7 @@ public class ChatServiceImpl implements ChatService {
                            ContactDao contactDao , ApplicationEventPublisher applicationEventPublisher ,
                            RoomFriendDao roomFriendDao , RoomGroupCache roomGroupCache ,
                            RoleService roleService , RecallMsgHandler recallMsgHandler ,
-                           ContactService contactService) {
+                           ContactService contactService , UserCache userCache) {
         this.userDao = userDao;
         this.roomGroupDao = roomGroupDao;
         this.groupMemberDao = groupMemberDao ;
@@ -96,6 +98,7 @@ public class ChatServiceImpl implements ChatService {
         this.roleService = roleService;
         this.recallMsgHandler = recallMsgHandler;
         this.contactService = contactService;
+        this.userCache = userCache;
     }
 
 
@@ -192,6 +195,20 @@ public class ChatServiceImpl implements ChatService {
         }
     }
 
+    /**
+     * 统计群成员
+     */
+    @Override
+    public ChatMemberStatisticResp getMemberStatistic() {
+        System.out.println(Thread.currentThread().getName());
+        Long onlineNum = userCache.getOnlineNum();
+//        Long offlineNum = userCache.getOfflineNum();不展示总人数
+        ChatMemberStatisticResp resp = new ChatMemberStatisticResp();
+        resp.setOnlineNum(onlineNum);
+//        resp.setTotalNum(onlineNum + offlineNum);
+        return resp;
+    }
+
     @Override
     public void recallMsg(Long uid, ChatMessageBaseReq request) {
         Message message = messageDao.getById(request.getMsgId());
@@ -199,6 +216,22 @@ public class ChatServiceImpl implements ChatService {
         checkRecall(uid , message);
         // 执行消息撤回
         recallMsgHandler.recall(uid, message);
+    }
+
+    @Override
+    @Cacheable(cacheNames = "member", key = "'memberList.'+#req.roomId")
+    public List<ChatMemberListResp> getMemberList(ChatMessageMemberReq req) {
+        if (Objects.equals(1L, req.getRoomId())) {//大群聊可看见所有人
+            return userDao.getMemberList()
+                    .stream()
+                    .map(a -> {
+                        ChatMemberListResp resp = new ChatMemberListResp();
+                        BeanUtils.copyProperties(a, resp);
+                        resp.setUid(a.getId());
+                        return resp;
+                    }).collect(Collectors.toList());
+        }
+        return null;
     }
 
     @Override

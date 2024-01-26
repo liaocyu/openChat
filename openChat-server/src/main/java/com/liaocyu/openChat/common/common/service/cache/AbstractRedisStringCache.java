@@ -1,7 +1,7 @@
 package com.liaocyu.openChat.common.common.service.cache;
 
 import cn.hutool.core.collection.CollectionUtil;
-import com.liaocyu.openChat.common.common.utils.RedisUtils;
+import com.liaocyu.openchat.utils.RedisUtils;
 import org.springframework.data.util.Pair;
 
 import java.lang.reflect.ParameterizedType;

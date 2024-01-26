@@ -4,9 +4,7 @@ import com.liaocyu.openChat.common.chat.domain.dto.MsgReadInfoDTO;
 import com.liaocyu.openChat.common.chat.domain.entity.Message;
 import com.liaocyu.openChat.common.chat.domain.vo.req.*;
 import com.liaocyu.openChat.common.chat.domain.vo.req.member.MemberReq;
-import com.liaocyu.openChat.common.chat.domain.vo.resp.ChatMemberResp;
-import com.liaocyu.openChat.common.chat.domain.vo.resp.ChatMessageReadResp;
-import com.liaocyu.openChat.common.chat.domain.vo.resp.ChatMessageResp;
+import com.liaocyu.openChat.common.chat.domain.vo.resp.*;
 import com.liaocyu.openChat.common.common.domain.vo.resp.CursorPageBaseResp;
 
 import javax.annotation.Nullable;
@@ -17,7 +15,7 @@ import java.util.List;
  * @author : create by lcy
  * @Project : openChat
  * @createTime : 2024/1/15 15:56
- * @description : TODO 消息处理类
+ * @description : 消息处理类
  */
 public interface ChatService {
 
@@ -50,6 +48,8 @@ public interface ChatService {
 
     void setMsgMark(Long uid, ChatMessageMarkReq request);
 
+    ChatMemberStatisticResp getMemberStatistic();
+
     /**
      * 撤回消息
      *
@@ -57,6 +57,8 @@ public interface ChatService {
      * @param request ChatMessageBaseReq(msgId , roomId)
      */
     void recallMsg(Long uid, ChatMessageBaseReq request);
+
+    List<ChatMemberListResp> getMemberList(ChatMessageMemberReq chatMessageMemberReq);
 
     CursorPageBaseResp<ChatMessageReadResp> getReadPage(Long uid, ChatMessageReadReq request);
 

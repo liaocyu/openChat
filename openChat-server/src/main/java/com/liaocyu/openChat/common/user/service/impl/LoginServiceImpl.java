@@ -1,7 +1,8 @@
 package com.liaocyu.openChat.common.user.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.liaocyu.openChat.common.common.constant.RedisKey;
-import com.liaocyu.openChat.common.common.utils.RedisUtils;
+import com.liaocyu.openchat.utils.RedisUtils;
 import com.liaocyu.openChat.common.user.service.LoginService;
 import com.liaocyu.openChat.common.common.utils.JwtUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -55,9 +56,18 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public String login(Long id) { // TODO 返给前端TOEKN
-        String token = jwtUtils.createToken(id);
+    public String login(Long uid) { // 返给前端TOEKN
+        /*String token = jwtUtils.createToken(id);
         RedisUtils.set(getUserTokenKey(id), token, TOKEN_EXPIRE_DAYS, TimeUnit.DAYS);
+        return token;*/
+        String key = RedisKey.getKey(RedisKey.USER_TOKEN_STRING, uid);
+        String token = RedisUtils.getStr(key);
+        if (StrUtil.isNotBlank(token)) {
+            return token;
+        }
+        //获取用户token
+        token = jwtUtils.createToken(uid);
+        RedisUtils.set(key, token, TOKEN_EXPIRE_DAYS, TimeUnit.DAYS);//token过期用redis中心化控制，初期采用5天过期，剩1天自动续期的方案。后续可以用双token实现
         return token;
     }
 

@@ -3,7 +3,7 @@ package com.liaocyu.openChat.common.common.aspect;
 import cn.hutool.core.util.StrUtil;
 import com.liaocyu.openChat.common.common.annotation.RedissonLock;
 import com.liaocyu.openChat.common.common.service.LockService;
-import com.liaocyu.openChat.common.common.utils.SpElUtils;
+import com.liaocyu.openchat.utils.SpElUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;

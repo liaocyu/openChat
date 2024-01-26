@@ -4,7 +4,7 @@ import com.liaocyu.openChat.common.common.thread.MyUncaughtExceptionHandler;
 import com.liaocyu.openChat.common.user.dao.UserDao;
 import com.liaocyu.openChat.common.user.domain.entity.User;
 import com.liaocyu.openChat.common.common.utils.JwtUtils;
-import com.liaocyu.openChat.common.common.utils.RedisUtils;
+import com.liaocyu.openchat.utils.RedisUtils ;
 import com.liaocyu.openChat.common.user.service.LoginService;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.error.WxErrorException;
@@ -77,8 +77,6 @@ class openChatServerApplicationTest {
         RedisUtils.set("name" , "卷心菜");
         String name = RedisUtils.getStr("name");
         System.out.println(name);
-/*
-        RedisUtils.get("")*/
     }
 
     @Test

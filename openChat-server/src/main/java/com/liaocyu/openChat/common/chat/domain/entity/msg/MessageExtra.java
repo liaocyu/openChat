@@ -17,7 +17,7 @@ import java.util.Map;
  * @author : create by lcy
  * @Project : openChat
  * @createTime : 2024/1/19 15:53
- * @description : TODO 消息扩展属性
+ * @description : 消息扩展属性
  *
  * 对于 @EqualsAndHashCode(callSuper = true) 是 lombox提供的注解
  *       用于生成 equals 和 hashcode 方法

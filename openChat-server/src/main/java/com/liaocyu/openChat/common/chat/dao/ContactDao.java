@@ -107,4 +107,11 @@ public class ContactDao extends ServiceImpl<ContactMapper, Contact> {
                 .ge(Contact::getReadTime, message.getCreateTime())
                 .count();
     }
+
+    public List<Contact> getByRoomIds(List<Long> roomIds, Long uid) {
+        return lambdaQuery()
+                .in(Contact::getRoomId, roomIds)
+                .eq(Contact::getUid, uid)
+                .list();
+    }
 }

@@ -5,7 +5,7 @@ import com.liaocyu.openChat.common.common.constant.RedisKey;
 import com.liaocyu.openChat.common.common.domain.vo.req.CursorPageBaseReq;
 import com.liaocyu.openChat.common.common.domain.vo.resp.CursorPageBaseResp;
 import com.liaocyu.openChat.common.common.utils.CursorUtils;
-import com.liaocyu.openChat.common.common.utils.RedisUtils;
+import com.liaocyu.openchat.utils.RedisUtils;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Component;
 

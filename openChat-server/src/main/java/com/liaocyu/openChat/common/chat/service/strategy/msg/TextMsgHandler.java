@@ -15,6 +15,7 @@ import com.liaocyu.openChat.common.common.domain.enums.YesOrNoEnum;
 import com.liaocyu.openChat.common.common.utils.AssertUtil;
 import com.liaocyu.openChat.common.common.utils.discover.PrioritizedUrlDiscover;
 import com.liaocyu.openChat.common.common.utils.discover.domain.UrlInfo;
+import com.liaocyu.openChat.common.sensitive.bootstrap.SensitiveWordBs;
 import com.liaocyu.openChat.common.user.domain.entity.User;
 import com.liaocyu.openChat.common.user.domain.enums.RoleEnum;
 import com.liaocyu.openChat.common.user.service.RoleService;
@@ -33,7 +34,7 @@ import java.util.stream.Collectors;
  * @author : create by lcy
  * @Project : openChat
  * @createTime : 2024/1/19 15:19
- * @description : TODO 文本消息处理类
+ * @description : 文本消息处理类
  */
 @Component("textMsgHandler")
 public class TextMsgHandler extends AbstractMsgHandler<TextMsgReq> {
@@ -43,16 +44,18 @@ public class TextMsgHandler extends AbstractMsgHandler<TextMsgReq> {
     private final UserInfoCache userInfoCache;
     private final RoleService roleService;
     private final MsgCache msgCache;
+    private final SensitiveWordBs sensitiveWordBs;
 
     @Autowired
     public TextMsgHandler(MessageDao messageDao , UserCache userCache ,
                           UserInfoCache userInfoCache , RoleService roleService ,
-                          MsgCache msgCache) {
+                          MsgCache msgCache , SensitiveWordBs sensitiveWordBs) {
         this.messageDao = messageDao;
         this.userCache = userCache;
         this.userInfoCache = userInfoCache;
         this.roleService = roleService;
         this.msgCache = msgCache;
+        this.sensitiveWordBs = sensitiveWordBs;
     }
 
     private static final PrioritizedUrlDiscover URL_TITLE_DISCOVER = new PrioritizedUrlDiscover();
@@ -96,9 +99,9 @@ public class TextMsgHandler extends AbstractMsgHandler<TextMsgReq> {
         MessageExtra extra = Optional.ofNullable(msg.getExtra()).orElse(new MessageExtra());
         Message update = new Message();
         update.setId(msg.getId());
-        // TODO 设置敏感词
-        // update.setContent(sensitiveWordBs.filter(body.getContent()));
-        //update.setExtra(extra);
+        // 设置敏感词
+        update.setContent(sensitiveWordBs.filter(body.getContent()));
+        update.setExtra(extra);
         //如果有回复消息
         if (Objects.nonNull(body.getReplyMsgId())) {
             Integer gapCount = messageDao.getGapCount(msg.getRoomId(), body.getReplyMsgId(), msg.getId());

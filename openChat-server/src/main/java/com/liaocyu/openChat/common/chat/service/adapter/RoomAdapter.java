@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
  * @author : create by lcy
  * @Project : openChat
  * @createTime : 2024/1/15 10:49
- * @description : TODO 消息适配器
+ * @description : 房间适配器
  */
 public class RoomAdapter {
 

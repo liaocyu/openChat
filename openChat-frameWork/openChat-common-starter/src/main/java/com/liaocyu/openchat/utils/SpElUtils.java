@@ -1,4 +1,4 @@
-package com.liaocyu.openChat.common.common.utils;
+package com.liaocyu.openchat.utils;
 
 import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.expression.EvaluationContext;

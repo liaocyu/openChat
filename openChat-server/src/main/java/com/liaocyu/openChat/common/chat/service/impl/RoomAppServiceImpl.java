@@ -1,12 +1,16 @@
 package com.liaocyu.openChat.common.chat.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Pair;
 import com.liaocyu.openChat.common.chat.dao.ContactDao;
 import com.liaocyu.openChat.common.chat.dao.GroupMemberDao;
+import com.liaocyu.openChat.common.chat.dao.MessageDao;
+import com.liaocyu.openChat.common.chat.domain.dto.RoomBaseInfo;
 import com.liaocyu.openChat.common.chat.domain.entity.*;
 import com.liaocyu.openChat.common.chat.domain.enums.GroupRoleAPPEnum;
 import com.liaocyu.openChat.common.chat.domain.enums.GroupRoleEnum;
 import com.liaocyu.openChat.common.chat.domain.enums.HotFlagEnum;
+import com.liaocyu.openChat.common.chat.domain.enums.RoomTypeEnum;
 import com.liaocyu.openChat.common.chat.domain.vo.req.*;
 import com.liaocyu.openChat.common.chat.domain.vo.req.member.MemberAddReq;
 import com.liaocyu.openChat.common.chat.domain.vo.req.member.MemberDelReq;
@@ -20,10 +24,9 @@ import com.liaocyu.openChat.common.chat.service.RoomService;
 import com.liaocyu.openChat.common.chat.service.RoomAppService;
 import com.liaocyu.openChat.common.chat.service.adapter.MemberAdapter;
 import com.liaocyu.openChat.common.chat.service.adapter.RoomAdapter;
-import com.liaocyu.openChat.common.chat.service.cache.GroupMemberCache;
-import com.liaocyu.openChat.common.chat.service.cache.HotRoomCache;
-import com.liaocyu.openChat.common.chat.service.cache.RoomCache;
-import com.liaocyu.openChat.common.chat.service.cache.RoomGroupCache;
+import com.liaocyu.openChat.common.chat.service.cache.*;
+import com.liaocyu.openChat.common.chat.service.strategy.AbstractMsgHandler;
+import com.liaocyu.openChat.common.chat.service.strategy.msg.MsgHandlerFactory;
 import com.liaocyu.openChat.common.common.annotation.RedissonLock;
 import com.liaocyu.openChat.common.common.domain.vo.req.CursorPageBaseReq;
 import com.liaocyu.openChat.common.common.domain.vo.resp.CursorPageBaseResp;
@@ -34,10 +37,13 @@ import com.liaocyu.openChat.common.user.dao.UserDao;
 import com.liaocyu.openChat.common.user.domain.entity.User;
 import com.liaocyu.openChat.common.user.domain.enums.RoleEnum;
 import com.liaocyu.openChat.common.user.service.RoleService;
+import com.liaocyu.openChat.common.user.service.adapter.ChatAdapter;
 import com.liaocyu.openChat.common.user.service.cache.UserCache;
 import com.liaocyu.openChat.common.user.service.cache.UserInfoCache;
 import com.liaocyu.openChat.common.websocket.domian.vo.resp.WSBaseResp;
 import com.liaocyu.openChat.common.websocket.domian.vo.resp.ws.WSMemberChange;
+import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
@@ -46,8 +52,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import javax.validation.constraints.NotNull;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -57,36 +63,25 @@ import java.util.stream.Collectors;
  * @description :
  */
 @Service("roomAppService")
+@RequiredArgsConstructor
 public class RoomAppServiceImpl implements RoomAppService {
 
-    @Autowired
-    private RoomService roomService;
-    @Autowired
-    private RoomCache roomCache;
-    @Autowired
-    private UserCache userCache;
-    @Autowired
-    private RoomGroupCache roomGroupCache;
-    @Autowired
-    private GroupMemberDao groupMemberDao;
-    @Autowired
-    private UserDao userDao;
-    @Autowired
-    private RoleService roleService;
-    @Autowired
-    private ApplicationEventPublisher applicationEventPublisher;
-    @Autowired
-    private ChatService chatService;
-    @Autowired
-    private GroupMemberCache groupMemberCache;
-    @Autowired
-    private PushService pushService;
-    @Autowired
-    private ContactDao contactDao;
-    @Autowired
-    private UserInfoCache userInfoCache;
-    @Autowired
-    private HotRoomCache hotRoomCache;
+    private final RoomService roomService;
+    private final RoomCache roomCache;
+    private final UserCache userCache;
+    private final RoomGroupCache roomGroupCache;
+    private final GroupMemberDao groupMemberDao;
+    private final UserDao userDao;
+    private final RoleService roleService;
+    private final ApplicationEventPublisher applicationEventPublisher;
+    private final ChatService chatService;
+    private final GroupMemberCache groupMemberCache;
+    private final PushService pushService;
+    private final ContactDao contactDao;
+    private final UserInfoCache userInfoCache;
+    private final HotRoomCache hotRoomCache;
+    private final MessageDao messageDao;
+    private final RoomFriendCache roomFriendCache;
 
     /**
      * 获取会话列表
@@ -114,7 +109,7 @@ public class RoomAppServiceImpl implements RoomAppService {
             baseRoomIds.addAll(hotRoomIds);
             // 基础会话和热门房间合并
             page = CursorPageBaseResp.init(contactPage, baseRoomIds);
-        } else {// 用户未登录，只查全局房间
+        } else {// 用户未登录，只查全局房间(热点房间)
             CursorPageBaseResp<Pair<Long, Double>> roomCursorPage = hotRoomCache.getRoomCursorPage(request);
             List<Long> roomIds = roomCursorPage.getList().stream().map(Pair::getKey).collect(Collectors.toList());
             page = CursorPageBaseResp.init(roomCursorPage, roomIds);
@@ -128,7 +123,6 @@ public class RoomAppServiceImpl implements RoomAppService {
         return Optional.ofNullable(cursor).map(Double::parseDouble).orElse(null);
     }
 
-    // TODO buildContactResp(uid, Collections.singletonList(friendRoom.getRoomId())).get(0)
     @Override
     public ChatRoomResp getContactDetailByFriend(Long uid, Long friendUid) {
 
@@ -137,7 +131,6 @@ public class RoomAppServiceImpl implements RoomAppService {
         return buildContactResp(uid, Collections.singletonList(friendRoom.getRoomId())).get(0);
     }
 
-    // TODO buildContactResp(uid, Collections.singletonList(roomId)).get(0)
     @Override
     public ChatRoomResp getContactDetail(Long uid, Long roomId) {
         // 查询好友之间的聊天室
@@ -219,7 +212,7 @@ public class RoomAppServiceImpl implements RoomAppService {
         GroupMember member = groupMemberDao.getMember(roomGroup.getId(), removedUid);
         AssertUtil.isNotEmpty(member , "用户已经移除");
         groupMemberDao.removeById(member.getId());
-        // TODO 发送移除事件告知群成员
+        // 发送移除事件告知群成员
         List<Long> memberUidList = groupMemberCache.getMemberUidList(roomGroup.getRoomId());
         WSBaseResp<WSMemberChange> ws = MemberAdapter.buildMemberRemoveWS(roomGroup.getRoomId(), member.getUid());
         pushService.sendPushMsg(ws, memberUidList);
@@ -234,7 +227,7 @@ public class RoomAppServiceImpl implements RoomAppService {
         // 批量保存群成员
         List<GroupMember> groupMembers = RoomAdapter.buildGroupMemberBatch(request.getUidList(), roomGroup.getId());
         groupMemberDao.saveBatch(groupMembers);
-        // 发送邀请加群消息==》触发每个人的会话
+        // 发送邀请加群消息==> 触发每个人的会话
         applicationEventPublisher.publishEvent(new GroupMemberAddEvent(this, roomGroup, groupMembers, uid));
         return roomGroup.getRoomId();
     }
@@ -275,7 +268,7 @@ public class RoomAppServiceImpl implements RoomAppService {
             return MemberAdapter.buildMemberList(memberList);
         } else {
             RoomGroup roomGroup = roomGroupCache.get(request.getRoomId());
-            AssertUtil.isNotEmpty(roomGroup , "群里聊房间错误");
+            AssertUtil.isNotEmpty(roomGroup , "群聊房间错误");
             List<Long> memberUidList = groupMemberDao.getMemberUidList(roomGroup.getId());
             Map<Long, User> batch = userInfoCache.getBatch(memberUidList);
             return MemberAdapter.buildMemberList(batch);
@@ -288,13 +281,7 @@ public class RoomAppServiceImpl implements RoomAppService {
                 || roleService.hasPower(self.getUid() , RoleEnum.ADMIN);
     }
 
-    /**
-     *
-     * @param uid uid
-     * @param roomGroup 群聊房间表
-     * @param room 群聊表
-     * @return
-     */
+
     private GroupRoleAPPEnum getGroupRole(Long uid, RoomGroup roomGroup, Room room) {
         // 查询群聊成员
         GroupMember member = Objects.isNull(uid) ? null : groupMemberDao.getMember(roomGroup.getId() , uid);
@@ -315,7 +302,116 @@ public class RoomAppServiceImpl implements RoomAppService {
 
     @NotNull
     private List<ChatRoomResp> buildContactResp(Long uid, List<Long> roomIds) {
-        return null;
+        // 表情和头像
+        Map<Long, RoomBaseInfo> roomBaseInfoMap = getRoomBaseInfoMap(roomIds, uid);
+        // 最后一条消息
+        List<Long> msgIds = roomBaseInfoMap.values().stream().map(RoomBaseInfo::getLastMsgId).collect(Collectors.toList());
+        List<Message> messages = CollectionUtil.isEmpty(msgIds) ? new ArrayList<>() :  messageDao.listByIds(msgIds);
+        Map<Long, Message> msgMap = messages.stream().collect(Collectors.toMap(Message::getId, Function.identity()));
+        Map<Long, User> lastMsgUidMap = userInfoCache.getBatch(messages.stream().map(Message::getFromUid).collect(Collectors.toList()));
+        // 消息未读数
+        Map<Long, Integer> unReadCountMap = getUnReadCountMap(uid, roomIds);
+        return roomBaseInfoMap.values().stream().map(room -> {
+                    ChatRoomResp resp = new ChatRoomResp();
+                    RoomBaseInfo roomBaseInfo = roomBaseInfoMap.get(room.getRoomId());
+                    resp.setAvatar(roomBaseInfo.getAvatar());
+                    resp.setRoomId(room.getRoomId());
+                    resp.setActiveTime(room.getActiveTime());
+                    resp.setHot_Flag(roomBaseInfo.getHotFlag());
+                    resp.setType(roomBaseInfo.getType());
+                    resp.setName(roomBaseInfo.getName());
+                    Message message = msgMap.get(room.getLastMsgId());
+                    if (Objects.nonNull(message)) {
+                        AbstractMsgHandler strategyNoNull = MsgHandlerFactory.getStrategyNoNull(message.getType());
+                        resp.setText(lastMsgUidMap.get(message.getFromUid()).getName() + ":" + strategyNoNull.showContactMsg(message));
+                    }
+                    resp.setUnreadCount(unReadCountMap.getOrDefault(room.getRoomId(), 0));
+                    return resp;
+                }).sorted(Comparator.comparing(ChatRoomResp::getActiveTime).reversed())
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 获取消息未读数
+     */
+    private Map<Long, Integer> getUnReadCountMap(Long uid, List<Long> roomIds) {
+        if (Objects.isNull(uid)) {
+            return new HashMap<>();
+        }
+        List<Contact> contacts = contactDao.getByRoomIds(roomIds, uid);
+        return contacts.parallelStream()
+                .map(contact -> Pair.of(contact.getRoomId(), messageDao.getUnReadCount(contact.getRoomId(), contact.getReadTime())))
+                .collect(Collectors.toMap(Pair::getKey , Pair::getValue));
+    }
+
+    private Map<Long, RoomBaseInfo> getRoomBaseInfoMap(List<Long> roomIds, Long uid) {
+        Map<Long, Room> roomMap = roomCache.getBatch(roomIds);
+        // 房间根据好友和群组类型分组
+        Map<Integer, List<Long>> groupRoomIdMap = roomMap.values().stream().collect(Collectors.groupingBy(Room::getType,
+                Collectors.mapping(Room::getId, Collectors.toList())));
+        // 获取群组信息
+        List<Long> groupRoomId = groupRoomIdMap.get(RoomTypeEnum.GROUP.getType());
+        Map<Long, RoomGroup> roomInfoBatch = roomGroupCache.getBatch(groupRoomId);
+        // 获取好友信息
+        List<Long> friendRoomId = groupRoomIdMap.get(RoomTypeEnum.FRIEND.getType());
+        Map<Long, User> friendRoomMap = getFriendRoomMap(friendRoomId, uid);
+
+        return roomMap.values().stream().map(room -> {
+            RoomBaseInfo roomBaseInfo = new RoomBaseInfo();
+            roomBaseInfo.setRoomId(room.getId());
+            roomBaseInfo.setType(room.getType());
+            roomBaseInfo.setHotFlag(room.getHotFlag());
+            roomBaseInfo.setLastMsgId(room.getLastMsgId());
+            roomBaseInfo.setActiveTime(room.getActiveTime());
+            if (RoomTypeEnum.of(room.getType()) == RoomTypeEnum.GROUP) {
+                RoomGroup roomGroup = roomInfoBatch.get(room.getId());
+                roomBaseInfo.setName(roomGroup.getName());
+                roomBaseInfo.setAvatar(roomGroup.getAvatar());
+            } else if (RoomTypeEnum.of(room.getType()) == RoomTypeEnum.FRIEND) {
+                User user = friendRoomMap.get(room.getId());
+                roomBaseInfo.setName(user.getName());
+                roomBaseInfo.setAvatar(user.getAvatar());
+            }
+            return roomBaseInfo;
+        }).collect(Collectors.toMap(RoomBaseInfo::getRoomId, Function.identity()));
+    }
+
+    private Map<Long, User> getFriendRoomMap(List<Long> roomIds, Long uid) {
+        if (CollectionUtil.isEmpty(roomIds)) {
+            return new HashMap<>();
+        }
+        Map<Long, RoomFriend> roomFriendMap = roomFriendCache.getBatch(roomIds);
+        Set<Long> friendUidSet = ChatAdapter.getFriendUidSet(roomFriendMap.values(), uid);
+        Map<Long, User> userBatch = userInfoCache.getBatch(new ArrayList<>(friendUidSet));
+        return roomFriendMap.values()
+                .stream()
+                .collect(Collectors.toMap(RoomFriend::getRoomId, roomFriend -> {
+                    Long friendUid = ChatAdapter.getFriendUid(roomFriend, uid);
+                    return userBatch.get(friendUid);
+                }));
+    }
+
+    private List<Contact> buildContact(List<Pair<Long, Double>> list, Long uid) {
+        List<Long> roomIds = list.stream().map(Pair::getKey).collect(Collectors.toList());
+        Map<Long, Room> batch = roomCache.getBatch(roomIds);
+        Map<Long, Contact> contactMap = new HashMap<>();
+        if (Objects.nonNull(uid)) {
+            List<Contact> byRoomIds = contactDao.getByRoomIds(roomIds, uid);
+            contactMap = byRoomIds.stream().collect(Collectors.toMap(Contact::getRoomId, Function.identity()));
+        }
+        Map<Long, Contact> finalContactMap = contactMap;
+        return list.stream().map(pair -> {
+            Long roomId = pair.getKey();
+            Contact contact = finalContactMap.get(roomId);
+            if (Objects.isNull(contact)) {
+                contact = new Contact();
+                contact.setRoomId(pair.getKey());
+                Room room = batch.get(roomId);
+                contact.setLastMsgId(room.getLastMsgId());
+            }
+            contact.setActiveTime(new Date(pair.getValue().longValue()));
+            return contact;
+        }).collect(Collectors.toList());
     }
 
 

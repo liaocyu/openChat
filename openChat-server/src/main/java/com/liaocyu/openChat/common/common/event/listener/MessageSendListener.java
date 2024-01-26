@@ -4,11 +4,13 @@ import com.liaocyu.openChat.common.chat.dao.MessageDao;
 import com.liaocyu.openChat.common.chat.domain.entity.Message;
 import com.liaocyu.openChat.common.chat.domain.entity.Room;
 import com.liaocyu.openChat.common.chat.domain.enums.HotFlagEnum;
+import com.liaocyu.openChat.common.chat.service.WeChatMsgOperationService;
 import com.liaocyu.openChat.common.chat.service.cache.RoomCache;
 import com.liaocyu.openChat.common.common.constant.MQConstant;
 import com.liaocyu.openChat.common.common.domain.dto.MsgSendMessageDTO;
 import com.liaocyu.openChat.common.common.event.MessageSendEvent;
 import com.liaocyu.openchat.transaction.service.MQProducer;
+import com.sun.xml.internal.bind.v2.TODO;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +24,7 @@ import java.util.Objects;
  * @author : create by lcy
  * @Project : openChat
  * @createTime : 2024/1/22 14:59
- * @description : TODO 消息推送监听器
+ * @description : 消息推送监听器
  */
 @Component("messageSendListener")
 @Slf4j
@@ -31,12 +33,14 @@ public class MessageSendListener {
     private final MessageDao messageDao;
     private final RoomCache roomCache;
     private final MQProducer mqProducer;
+    private final WeChatMsgOperationService weChatMsgOperationService;
 
     @Autowired
-    public MessageSendListener(MessageDao messageDao , RoomCache roomCache , MQProducer mqProducer) {
+    public MessageSendListener(MessageDao messageDao , RoomCache roomCache , MQProducer mqProducer, WeChatMsgOperationService weChatMsgOperationService) {
         this.messageDao = messageDao;
         this.roomCache = roomCache;
         this.mqProducer = mqProducer;
+        this.weChatMsgOperationService = weChatMsgOperationService;
     }
 
     // 消息推送方案设计
@@ -68,9 +72,9 @@ public class MessageSendListener {
     public void publishChatToWechat(@NotNull MessageSendEvent event) {
         Message message = messageDao.getById(event.getMsgId());
         if (Objects.nonNull(message.getExtra().getAtUidList())) {
-            // TODO 微信消息推送服务
-            /* weChatMsgOperationService.publishChatMsgToWeChatUser(message.getFromUid(), message.getExtra().getAtUidList(),
-                    message.getContent());*/
+            // 微信消息推送服务
+             weChatMsgOperationService.publishChatMsgToWeChatUser(message.getFromUid(), message.getExtra().getAtUidList(),
+                    message.getContent());
         }
     }
 

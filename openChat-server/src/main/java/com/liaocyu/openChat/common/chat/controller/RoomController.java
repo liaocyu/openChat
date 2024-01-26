@@ -61,7 +61,7 @@ public class RoomController {
 
     /**
      * 返回群成员列表列表信息
-     * TODO 注：这里默认看到的是热点群聊信息
+     * 这里默认看到的是热点群聊信息
      * @param request 房间表Id
      * @return
      */

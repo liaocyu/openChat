@@ -1,9 +1,6 @@
 package com.liaocyu.openChat.common.chat.service.impl;
 
-import com.liaocyu.openChat.common.chat.dao.ContactDao;
-import com.liaocyu.openChat.common.chat.dao.GroupMemberDao;
-import com.liaocyu.openChat.common.chat.dao.RoomDao;
-import com.liaocyu.openChat.common.chat.dao.RoomGroupDao;
+import com.liaocyu.openChat.common.chat.dao.*;
 import com.liaocyu.openChat.common.chat.domain.entity.Room;
 import com.liaocyu.openChat.common.chat.domain.entity.RoomGroup;
 import com.liaocyu.openChat.common.chat.domain.vo.req.admin.AdminAddReq;
@@ -42,17 +39,20 @@ public class GroupMemberServiceImpl implements GroupMemberService {
     private final ContactDao contactDao;
     private final GroupMemberCache groupMemberCache;
     private final PushService pushService;
+    private final MessageDao messageDao;
 
     @Autowired
-    public GroupMemberServiceImpl(RoomGroupDao roomGroupDao , RoomDao roomDao , GroupMemberDao groupMemberDao, ContactDao contactDao , GroupMemberCache groupMemberCache , PushService pushService) {
+    public GroupMemberServiceImpl(RoomGroupDao roomGroupDao , RoomDao roomDao , GroupMemberDao groupMemberDao,MessageDao messageDao,
+                                  ContactDao contactDao , GroupMemberCache groupMemberCache , PushService pushService) {
         this.roomGroupDao = roomGroupDao;
         this.roomDao = roomDao;
         this.groupMemberDao = groupMemberDao;
         this.contactDao = contactDao;
         this.groupMemberCache = groupMemberCache;
         this.pushService = pushService;
+        this.messageDao = messageDao;
     }
-    // TODO 删除全成员
+    // TODO 删除全成员✔
 
     /**
      * 退出群聊
@@ -88,10 +88,10 @@ public class GroupMemberServiceImpl implements GroupMemberService {
             // 4.3 删除群成员
             Boolean isDelGroupMember = groupMemberDao.removeByGroupId(roomGroup.getId() ,Collections.EMPTY_LIST);
             AssertUtil.isTrue(isDelGroupMember , CommonErrorEnum.SYSTEM_ERROR);
-            // 4.4 TODO 删除消息记录（逻辑）
-            /*Boolean isDelMessage = messageDao.removeByRoomId(roomId, Collections.EMPTY_LIST);
-            AssertUtil.isTrue(isDelMessage, CommonErrorEnum.SYSTEM_ERROR);*/
-            // TODO 这里也可以告知群成员 群聊已被删除的消息
+            // 4.4 删除消息记录（逻辑）
+            Boolean isDelMessage = messageDao.removeByRoomId(roomId, Collections.EMPTY_LIST);
+            AssertUtil.isTrue(isDelMessage, CommonErrorEnum.SYSTEM_ERROR);
+            // TODO 这里也可以告知群成员 群聊已被删除的消息✔
         } else {
             // 4.5 删除会话
             Boolean isDelContact = contactDao.removeByRoomId(roomId, Collections.singletonList(uid));

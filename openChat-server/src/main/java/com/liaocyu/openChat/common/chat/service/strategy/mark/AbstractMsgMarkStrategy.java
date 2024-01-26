@@ -27,7 +27,6 @@ import java.util.Optional;
 @NoArgsConstructor
 public abstract class AbstractMsgMarkStrategy {
 
-    // TODO 这里也许可能会有问题
     private MessageMarkDao messageMarkDao;
     private ApplicationEventPublisher applicationEventPublisher;
     @Autowired

@@ -2,6 +2,8 @@ package com.liaocyu.openChat.common.user.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.google.common.collect.Lists;
+import com.liaocyu.openChat.common.chat.service.ChatService;
+import com.liaocyu.openChat.common.chat.service.adapter.MessageAdapter;
 import com.liaocyu.openChat.common.common.annotation.RedissonLock;
 import com.liaocyu.openChat.common.common.domain.vo.req.CursorPageBaseReq;
 import com.liaocyu.openChat.common.common.domain.vo.req.PageBaseReq;
@@ -57,14 +59,17 @@ public class FriendServiceImpl implements FriendService {
     private final RoomService roomService;
     private final UserApplyDao userApplyDao;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final ChatService chatService;
 
     @Autowired
-    public FriendServiceImpl(UserFriendDao userFriendDao, UserDao userDao, RoomService roomService, UserApplyDao userApplyDao, ApplicationEventPublisher applicationEventPublisher) {
+    public FriendServiceImpl(UserFriendDao userFriendDao, UserDao userDao, RoomService roomService, UserApplyDao userApplyDao
+                            , ApplicationEventPublisher applicationEventPublisher , ChatService chatService) {
         this.userFriendDao = userFriendDao;
         this.userDao = userDao;
         this.roomService = roomService;
         this.userApplyDao = userApplyDao;
         this.applicationEventPublisher = applicationEventPublisher;
+        this.chatService = chatService;
     }
 
 
@@ -174,8 +179,8 @@ public class FriendServiceImpl implements FriendService {
         createFriend(uid, userApply.getUid());
         // 创建一个聊天房间
         RoomFriend roomFriend = roomService.createFriendRoom(Arrays.asList(uid, userApply.getUid()));
-        // TODO 发送一条同意消息。。我们已经是好友了，开始聊天吧
-        // chatService.sendMsg(MessageAdapter.buildAgreeMsg(roomFriend.getRoomId()), uid);
+        // 发送一条同意消息。。我们已经是好友了，开始聊天吧
+        chatService.sendMsg(MessageAdapter.buildAgreeMsg(roomFriend.getRoomId()), uid);
     }
 
     /**

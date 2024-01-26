@@ -28,7 +28,7 @@ public class MPGenerator {
         //全局配置
         GlobalConfig globalConfig = new GlobalConfig();
         globalConfig.setOpen(false);
-        //todo 要改输出路径
+        //todo 要改输出路径✔
         globalConfig.setOutputDir(System.getProperty("user.dir") + "/openChat-server/src/main/java");
         //设置作者名字
         globalConfig.setAuthor("<a href=\"https://github.com/liaocyu\">liaocyu</a>");
@@ -55,7 +55,7 @@ public class MPGenerator {
         strategyConfig.setColumnNaming(NamingStrategy.underline_to_camel);
         //字段和表注解
         strategyConfig.setEntityTableFieldAnnotationEnable(true);
-        //todo 这里修改需要自动生成的表结构
+        //todo 这里修改需要自动生成的表结构✔
         strategyConfig.setInclude(
                 "message_mark" ,
                 "wx_msg" /*,
@@ -78,7 +78,7 @@ public class MPGenerator {
         autoGenerator.execute();
 
     }
-    //todo 这里修改你的数据源
+    //todo 这里修改你的数据源✔
     public static void assembleDev(DataSourceConfig dataSourceConfig) {
         dataSourceConfig.setDriverName("com.mysql.cj.jdbc.Driver");
         dataSourceConfig.setUsername("root");

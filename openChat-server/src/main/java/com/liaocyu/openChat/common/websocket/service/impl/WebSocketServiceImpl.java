@@ -1,9 +1,11 @@
 package com.liaocyu.openChat.common.websocket.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.json.JSONUtil;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.liaocyu.openChat.common.common.event.UserOfflineEvent;
 import com.liaocyu.openChat.common.common.event.UserOnlineEvent;
 import com.liaocyu.openChat.common.user.dao.UserDao;
 import com.liaocyu.openChat.common.user.domain.entity.User;
@@ -32,6 +34,7 @@ import java.util.Date;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * @author : create by lcy
@@ -62,8 +65,8 @@ public class WebSocketServiceImpl implements WebSocketService {
     RoleService roleService;
 
     // 注入 webSocketExecutor 线程池配置
-    @Qualifier("websocketExecutor")
     @Autowired
+    @Qualifier("websocketExecutor")
     ThreadPoolTaskExecutor threadPoolTaskExecutor;
 
     /**
@@ -71,6 +74,13 @@ public class WebSocketServiceImpl implements WebSocketService {
      * WSChannelExtraDTO 服务层 用户中间信息
      */
     private static final ConcurrentHashMap<Channel, WSChannelExtraDTO> ONLINE_WS_MAP = new ConcurrentHashMap<>();
+
+
+    /**
+     * 所有在线的用户和对应的socket
+     */
+    private static final ConcurrentHashMap<Long, CopyOnWriteArrayList<Channel>> ONLINE_UID_MAP = new ConcurrentHashMap<>();
+
 
     /**
      * 临时保存登录code和channel的映射关系
@@ -114,8 +124,32 @@ public class WebSocketServiceImpl implements WebSocketService {
 
     @Override
     public void remove(Channel channel) {
+        WSChannelExtraDTO wsChannelExtraDTO = ONLINE_WS_MAP.get(channel);
+        Optional<Long> uidOptional = Optional.ofNullable(wsChannelExtraDTO)
+                .map(WSChannelExtraDTO::getUid);
+        boolean offlineAll = offline(channel, uidOptional);
+        if (uidOptional.isPresent() && offlineAll) {//已登录用户断连,并且全下线成功
+            User user = new User();
+            user.setId(uidOptional.get());
+            user.setLastOptTime(new Date());
+            applicationEventPublisher.publishEvent(new UserOfflineEvent(this, user));
+        }
+    }
+
+    /**
+     * 用户下线
+     * return 是否全下线成功
+     */
+    private boolean offline(Channel channel, Optional<Long> uidOptional) {
         ONLINE_WS_MAP.remove(channel);
-        // TODO 用户下线广播
+        if (uidOptional.isPresent()) {
+            CopyOnWriteArrayList<Channel> channels = ONLINE_UID_MAP.get(uidOptional.get());
+            if (CollectionUtil.isNotEmpty(channels)) {
+                channels.removeIf(ch -> Objects.equals(ch, channel));
+            }
+            return CollectionUtil.isEmpty(ONLINE_UID_MAP.get(uidOptional.get()));
+        }
+        return true;
     }
 
     @Override
@@ -171,6 +205,17 @@ public class WebSocketServiceImpl implements WebSocketService {
         // 获取所有连接的用户 并将消息进行批量推送
         ONLINE_WS_MAP.forEach((channel, ext) -> {
             threadPoolTaskExecutor.execute(() -> sendMsg(channel, msg));
+        });
+    }
+
+    //entrySet的值不是快照数据,但是它支持遍历，所以无所谓了，不用快照也行。
+    @Override
+    public void sendToAllOnline(WSBaseResp<?> wsBaseResp, Long skipUid) {
+        ONLINE_WS_MAP.forEach((channel, ext) -> {
+            if (Objects.nonNull(skipUid) && Objects.equals(ext.getUid(), skipUid)) {
+                return;
+            }
+            threadPoolTaskExecutor.execute(() -> sendMsg(channel, wsBaseResp));
         });
     }
 

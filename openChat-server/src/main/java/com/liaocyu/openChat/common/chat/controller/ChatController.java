@@ -5,11 +5,13 @@ import com.liaocyu.openChat.common.chat.domain.vo.req.*;
 import com.liaocyu.openChat.common.chat.domain.vo.resp.ChatMessageReadResp;
 import com.liaocyu.openChat.common.chat.domain.vo.resp.ChatMessageResp;
 import com.liaocyu.openChat.common.chat.service.ChatService;
+import com.liaocyu.openChat.common.common.annotation.FrequencyControl;
 import com.liaocyu.openChat.common.common.domain.vo.resp.ApiResult;
 import com.liaocyu.openChat.common.common.domain.vo.resp.CursorPageBaseResp;
 import com.liaocyu.openChat.common.common.utils.RequestHolder;
 import com.liaocyu.openChat.common.user.domain.enums.BlackTypeEnum;
 import com.liaocyu.openChat.common.user.service.cache.UserCache;
+import com.sun.xml.internal.bind.v2.TODO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
@@ -74,10 +76,9 @@ public class ChatController {
      */
     @PostMapping("msg")
     @ApiOperation("发送消息")
-    // TODO 频控注解
-    /*@FrequencyControl(time = 5, count = 3, target = FrequencyControl.Target.UID)
+    @FrequencyControl(time = 5, count = 3, target = FrequencyControl.Target.UID)
     @FrequencyControl(time = 30, count = 5, target = FrequencyControl.Target.UID)
-    @FrequencyControl(time = 60, count = 10, target = FrequencyControl.Target.UID)*/
+    @FrequencyControl(time = 60, count = 10, target = FrequencyControl.Target.UID)
     public ApiResult<ChatMessageResp> sendMsg(@Valid @RequestBody ChatMessageReq request) {
         Long msgId = chatService.sendMsg(request, RequestHolder.get().getUid());
         //返回完整消息格式，方便前端展示
@@ -86,7 +87,7 @@ public class ChatController {
 
     @PutMapping("msg/mark")
     @ApiOperation("消息标记")
-    // TODO 频控注解 @FrequencyControl(time = 10, count = 5, target = FrequencyControl.Target.UID)
+    @FrequencyControl(time = 10, count = 5, target = FrequencyControl.Target.UID)
     public ApiResult<Void> setMsgMark(@Valid @RequestBody ChatMessageMarkReq request) {
         chatService.setMsgMark(RequestHolder.get().getUid(), request);
         return ApiResult.success();
@@ -94,7 +95,7 @@ public class ChatController {
 
     @PutMapping("msg/recall")
     @ApiOperation("撤回消息")
-    // TODO 频控注解 @FrequencyControl(time = 20, count = 3, target = FrequencyControl.Target.UID)
+    @FrequencyControl(time = 20, count = 3, target = FrequencyControl.Target.UID)
     public ApiResult<Void> recallMsg(@Valid @RequestBody ChatMessageBaseReq request) {
         chatService.recallMsg(RequestHolder.get().getUid(), request);
         return ApiResult.success();

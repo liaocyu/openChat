@@ -103,7 +103,7 @@ public class WxPortalController {
         System.out.println(userInfo);
         wxMsgServeice.authorize(userInfo);
         RedirectView redirectView = new RedirectView();
-        // TODO 返回自己的网站
+        // TODO 返回自己的网站 ✔
         redirectView.setUrl("https://mp.weixin.qq.com/s/m1SRsBG96kLJW5mPe4AVGA");
         return redirectView;
     }

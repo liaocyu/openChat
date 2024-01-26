@@ -82,9 +82,7 @@ public class UserFriendController {
 
 
     /**
-     * TODO 联系人列表
      * @see com.liaocyu.openChat.common.common.domain.vo.req.CursorPageBaseReq  游标翻页请求
-     * @param request 我的请求
      * @return
      */
     @GetMapping("page")

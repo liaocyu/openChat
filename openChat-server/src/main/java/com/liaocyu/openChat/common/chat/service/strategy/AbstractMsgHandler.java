@@ -18,7 +18,7 @@ import java.lang.reflect.ParameterizedType;
  * @author : create by lcy
  * @Project : openChat
  * @createTime : 2024/1/19 11:23
- * @description : TODO 消息处理器抽象类
+ * @description : 消息处理器抽象类
  */
 public abstract class AbstractMsgHandler<Req> {
     @Autowired
