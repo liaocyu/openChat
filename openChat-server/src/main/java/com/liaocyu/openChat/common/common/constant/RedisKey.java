@@ -7,7 +7,7 @@ package com.liaocyu.openChat.common.common.constant;
  * @description :
  */
 public class RedisKey {
-    public static final String BASE_KEY = "openchat:chat";
+    public static final String BASE_KEY = "openchat:";
 
     /**
      * 在线用户列表
@@ -46,6 +46,28 @@ public class RedisKey {
      * 用户信息
      */
     public static final String USER_INFO_STRING = "userInfo:uid_%d";
+
+    /**
+     * 用户的信息汇总
+     */
+    public static final String USER_SUMMARY_STRING = "userSummary:uid_%d";
+
+    /**
+     * 用户GPT聊天次数
+     */
+    public static final String USER_CHAT_NUM = "useChatGPTNum:uid_%d";
+
+    public static final String USER_CHAT_CONTEXT = "useChatGPTContext:uid_%d_roomId_%d";
+
+    /**
+     * 保存Open id
+     */
+    public static final String OPEN_ID_STRING = "openid:%s";
+
+    /**
+     * 用户上次使用GLM使用时间
+     */
+    public static final String USER_GLM2_TIME_LAST = "userGLM2UseTime:uid_%d";
 
     // 拼接基础key  openchat:chat + key
     public static String getKey(String key , Object... o) {

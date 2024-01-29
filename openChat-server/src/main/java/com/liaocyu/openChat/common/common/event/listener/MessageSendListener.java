@@ -6,6 +6,7 @@ import com.liaocyu.openChat.common.chat.domain.entity.Room;
 import com.liaocyu.openChat.common.chat.domain.enums.HotFlagEnum;
 import com.liaocyu.openChat.common.chat.service.WeChatMsgOperationService;
 import com.liaocyu.openChat.common.chat.service.cache.RoomCache;
+import com.liaocyu.openChat.common.chatai.service.IChatAIService;
 import com.liaocyu.openChat.common.common.constant.MQConstant;
 import com.liaocyu.openChat.common.common.domain.dto.MsgSendMessageDTO;
 import com.liaocyu.openChat.common.common.event.MessageSendEvent;
@@ -34,13 +35,16 @@ public class MessageSendListener {
     private final RoomCache roomCache;
     private final MQProducer mqProducer;
     private final WeChatMsgOperationService weChatMsgOperationService;
+    private final IChatAIService openAIService;
 
     @Autowired
-    public MessageSendListener(MessageDao messageDao , RoomCache roomCache , MQProducer mqProducer, WeChatMsgOperationService weChatMsgOperationService) {
+    public MessageSendListener(MessageDao messageDao , RoomCache roomCache , MQProducer mqProducer,
+                               WeChatMsgOperationService weChatMsgOperationService , IChatAIService openAIService) {
         this.messageDao = messageDao;
         this.roomCache = roomCache;
         this.mqProducer = mqProducer;
         this.weChatMsgOperationService = weChatMsgOperationService;
+        this.openAIService = openAIService;
     }
 
     // 消息推送方案设计
@@ -55,8 +59,8 @@ public class MessageSendListener {
         Message message = messageDao.getById(event.getMsgId());
         Room room = roomCache.get(message.getRoomId());
         if (isHotRoom(room)) {
-            // TODO OpenAI 服务
-            // openAIService.chat(message);
+            // OpenAI 服务
+            openAIService.chat(message);
         }
     }
 

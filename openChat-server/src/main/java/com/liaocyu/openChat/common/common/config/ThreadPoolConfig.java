@@ -1,6 +1,7 @@
 package com.liaocyu.openChat.common.common.config;
 
 import com.liaocyu.openChat.common.common.thread.MyThreadFactory;
+import com.liaocyu.openchat.transaction.annotation.SecureInvokeConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -17,7 +18,7 @@ import java.util.concurrent.ThreadPoolExecutor;
  */
 @Configuration
 @EnableAsync
-public class ThreadPoolConfig implements AsyncConfigurer {
+public class ThreadPoolConfig implements AsyncConfigurer, SecureInvokeConfigurer {
     /**
      * 项目共用线程池
      */
@@ -27,11 +28,16 @@ public class ThreadPoolConfig implements AsyncConfigurer {
      */
     public static final String WS_EXECUTOR = "websocketExecutor";
 
+    public static final String AICHAT_EXECUTOR = "aichatExecutor";
+
     @Override
     public Executor getAsyncExecutor() {
         return openchatExecutor();
-       /* return mallchatExecutor();*/
+    }
 
+    @Override
+    public Executor getSecureInvokeExecutor() {
+        return openchatExecutor();
     }
 
     @Bean(OPENCHAT_EXECUTOR)
@@ -50,9 +56,9 @@ public class ThreadPoolConfig implements AsyncConfigurer {
     }
 
     @Bean(WS_EXECUTOR)
-    @Primary
     public ThreadPoolTaskExecutor webSocketExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        // TODO 可能出错 ❌
         executor.setWaitForTasksToCompleteOnShutdown(true);
         executor.setCorePoolSize(16);
         executor.setMaxPoolSize(16);
@@ -62,6 +68,18 @@ public class ThreadPoolConfig implements AsyncConfigurer {
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy());
         executor.setThreadFactory(new MyThreadFactory(executor)); // 指定线程池的线程工厂
         executor.initialize();
+        return executor;
+    }
+
+    @Bean(AICHAT_EXECUTOR)
+    public ThreadPoolTaskExecutor chatAiExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(10);
+        executor.setMaxPoolSize(10);
+        executor.setQueueCapacity(15);
+        executor.setThreadNamePrefix("aichat-executor-");
+        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy());//满了直接丢弃，默认为不重要消息推送
+        executor.setThreadFactory(new MyThreadFactory(executor));
         return executor;
     }
 }
