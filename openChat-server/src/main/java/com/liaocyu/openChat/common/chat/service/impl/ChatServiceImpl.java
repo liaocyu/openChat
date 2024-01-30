@@ -34,7 +34,7 @@ import com.liaocyu.openChat.common.common.utils.AssertUtil;
 import com.liaocyu.openChat.common.user.dao.UserDao;
 import com.liaocyu.openChat.common.user.domain.entity.User;
 import com.liaocyu.openChat.common.user.domain.enums.RoleEnum;
-import com.liaocyu.openChat.common.user.service.ContactService;
+import com.liaocyu.openChat.common.chat.service.ContactService;
 import com.liaocyu.openChat.common.user.service.RoleService;
 import com.liaocyu.openChat.common.user.service.cache.UserCache;
 import com.liaocyu.openChat.common.websocket.domian.enums.ChatActiveStatusEnum;

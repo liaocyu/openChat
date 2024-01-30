@@ -1,4 +1,4 @@
-package com.liaocyu.openChat.common.user.service;
+package com.liaocyu.openChat.common.chat.service;
 
 import cn.hutool.core.collection.CollUtil;
 import com.liaocyu.openChat.common.chat.domain.dto.MsgReadInfoDTO;

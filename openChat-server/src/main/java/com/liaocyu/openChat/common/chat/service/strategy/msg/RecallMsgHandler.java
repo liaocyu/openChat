@@ -6,6 +6,7 @@ import com.liaocyu.openChat.common.chat.domain.entity.Message;
 import com.liaocyu.openChat.common.chat.domain.entity.msg.MessageExtra;
 import com.liaocyu.openChat.common.chat.domain.entity.msg.MsgRecall;
 import com.liaocyu.openChat.common.chat.domain.enums.MessageTypeEnum;
+import com.liaocyu.openChat.common.chat.service.cache.MsgCache;
 import com.liaocyu.openChat.common.chat.service.strategy.AbstractMsgHandler;
 import com.liaocyu.openChat.common.common.event.MessageRecallEvent;
 import com.liaocyu.openChat.common.user.domain.entity.User;
@@ -29,12 +30,15 @@ public class RecallMsgHandler extends AbstractMsgHandler<Object> {
     private final MessageDao messageDao;
     private final UserCache userCache;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final MsgCache msgCache;
 
     @Autowired
-    public RecallMsgHandler(MessageDao messageDao, UserCache userCache, ApplicationEventPublisher applicationEventPublisher) {
+    public RecallMsgHandler(MessageDao messageDao, UserCache userCache, MsgCache msgCache ,
+                            ApplicationEventPublisher applicationEventPublisher) {
         this.messageDao = messageDao;
         this.userCache = userCache;
         this.applicationEventPublisher = applicationEventPublisher;
+        this.msgCache = msgCache;
     }
 
     @Override
@@ -59,7 +63,7 @@ public class RecallMsgHandler extends AbstractMsgHandler<Object> {
 
     @Override
     public Object showReplyMsg(Message msg) {
-        return "原消息已被撤回";
+        return "语音已被撤回";
     }
 
     public void recall(Long recallUid, Message message) {//todo 消息覆盖问题用版本号解决✔

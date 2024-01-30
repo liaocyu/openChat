@@ -22,7 +22,7 @@ spring:
     # 连接超时时间
     timeout: 1800000
     # 设置密码
-#    password: ${mallchat.redis.password}
+    #password: ${mallchat.redis.password}
   jackson:
     serialization:
       write-dates-as-timestamps: true
@@ -63,4 +63,20 @@ rocketmq:
     listeners: # 配置某个消费分组，是否监听指定 Topic 。结构为 Map<消费者分组, <Topic, Boolean>> 。默认情况下，不配置表示监听。
       erbadagang-consumer-group:
         topic1: false # 关闭 test-consumer-group 对 topic1 的监听消费
+chatai:
+  chatgpt:
+    use: ${mallchat.chatgpt.use}
+    AIUserId: ${mallchat.chatgpt.uid}
+    key: ${mallchat.chatgpt.key}
+    proxyUrl: ${mallchat.chatgpt.proxyUrl}
+  chatglm2:
+    use: ${mallchat.chatglm2.use}
+    url: ${mallchat.chatglm2.url}
+    minute: 3 # 每个用户每3分钟可以请求一次
+    AIUserId: ${mallchat.chatglm2.uid}
 
+logging:
+  level:
+    org.springframework.web: INFO
+    com.github.binarywang.demo.wx.mp: DEBUG
+    me.chanjar.weixin: DEBUG

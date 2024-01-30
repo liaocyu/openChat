@@ -114,7 +114,7 @@ public class RoomAppServiceImpl implements RoomAppService {
             List<Long> roomIds = roomCursorPage.getList().stream().map(Pair::getKey).collect(Collectors.toList());
             page = CursorPageBaseResp.init(roomCursorPage, roomIds);
         }
-        // 最后组装会话信息（名称，头像，未读数等）
+        // TODO 最后组装会话信息（名称，头像，未读数等） ❌
         List<ChatRoomResp> result = buildContactResp(uid, page.getList());
         return CursorPageBaseResp.init(page, result);
     }
@@ -306,7 +306,7 @@ public class RoomAppServiceImpl implements RoomAppService {
         Map<Long, RoomBaseInfo> roomBaseInfoMap = getRoomBaseInfoMap(roomIds, uid);
         // 最后一条消息
         List<Long> msgIds = roomBaseInfoMap.values().stream().map(RoomBaseInfo::getLastMsgId).collect(Collectors.toList());
-        List<Message> messages = CollectionUtil.isEmpty(msgIds) ? new ArrayList<>() :  messageDao.listByIds(msgIds);
+        List<Message> messages = CollectionUtil.isEmpty(msgIds) ? new ArrayList<>() : messageDao.listByIds(msgIds);
         Map<Long, Message> msgMap = messages.stream().collect(Collectors.toMap(Message::getId, Function.identity()));
         Map<Long, User> lastMsgUidMap = userInfoCache.getBatch(messages.stream().map(Message::getFromUid).collect(Collectors.toList()));
         // 消息未读数
@@ -320,8 +320,9 @@ public class RoomAppServiceImpl implements RoomAppService {
                     resp.setHot_Flag(roomBaseInfo.getHotFlag());
                     resp.setType(roomBaseInfo.getType());
                     resp.setName(roomBaseInfo.getName());
+                    // 这里有问题
                     Message message = msgMap.get(room.getLastMsgId());
-                    if (Objects.nonNull(message)) {
+                     if (Objects.nonNull(message)) {
                         AbstractMsgHandler strategyNoNull = MsgHandlerFactory.getStrategyNoNull(message.getType());
                         resp.setText(lastMsgUidMap.get(message.getFromUid()).getName() + ":" + strategyNoNull.showContactMsg(message));
                     }

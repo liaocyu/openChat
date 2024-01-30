@@ -15,6 +15,7 @@ import com.liaocyu.openChat.common.chat.service.cache.GroupMemberCache;
 import com.liaocyu.openChat.common.chat.service.cache.HotRoomCache;
 import com.liaocyu.openChat.common.chat.service.cache.RoomCache;
 import com.liaocyu.openChat.common.chat.service.impl.PushService;
+import com.liaocyu.openChat.common.chatai.service.IChatAIService;
 import com.liaocyu.openChat.common.common.constant.MQConstant;
 import com.liaocyu.openChat.common.common.domain.dto.MsgSendMessageDTO;
 import com.liaocyu.openChat.common.user.service.adapter.WSAdapter;
@@ -40,7 +41,7 @@ import java.util.Objects;
  * SEND_MSG_TOPIC: chat_send_msg
  */
 @RocketMQMessageListener(consumerGroup = MQConstant.SEND_MSG_GROUP, topic = MQConstant.SEND_MSG_TOPIC)
-@Component
+@Component("msgSendConsumer")
 public class MsgSendConsumer implements RocketMQListener<MsgSendMessageDTO> {
     @Autowired
     private WebSocketService webSocketService;
@@ -48,8 +49,8 @@ public class MsgSendConsumer implements RocketMQListener<MsgSendMessageDTO> {
     private ChatService chatService;
     @Autowired
     private MessageDao messageDao;
-    /*@Autowired
-    private IChatAIService openAIService;*/
+    @Autowired
+    private IChatAIService openAIService;
     @Autowired
     WeChatMsgOperationService weChatMsgOperationService;
     @Autowired

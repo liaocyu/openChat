@@ -41,7 +41,8 @@ public class ContactController {
     @ApiOperation("会话列表")
     public ApiResult<CursorPageBaseResp<ChatRoomResp>> getRoomPage(@Valid CursorPageBaseReq request) {
         Long uid = RequestHolder.get().getUid();
-        return ApiResult.success(roomAppService.getContactPage(request, uid));
+        CursorPageBaseResp<ChatRoomResp> contactPage = roomAppService.getContactPage(request, uid);
+        return ApiResult.success(contactPage);
     }
 
     /**

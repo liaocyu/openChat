@@ -896,7 +896,7 @@ public class RedisUtils {
     /**
      * 根据Score值查询集合元素, 从小到大排序
      *
-     * @param key
+     * @param key openchat:hotRoom
      * @param min 最小值
      * @param max 最大值
      * @return

@@ -4,7 +4,7 @@ import com.liaocyu.openChat.common.chat.dao.ContactDao;
 import com.liaocyu.openChat.common.chat.domain.dto.MsgReadInfoDTO;
 import com.liaocyu.openChat.common.chat.domain.entity.Message;
 import com.liaocyu.openChat.common.common.utils.AssertUtil;
-import com.liaocyu.openChat.common.user.service.ContactService;
+import com.liaocyu.openChat.common.chat.service.ContactService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
