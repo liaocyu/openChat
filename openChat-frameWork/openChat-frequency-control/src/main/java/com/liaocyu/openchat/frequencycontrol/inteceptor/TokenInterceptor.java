@@ -15,7 +15,7 @@ import java.util.Optional;
 
 @Order(-2)
 @Slf4j
-@Component
+@Component("tokenInterceptor")
 public class TokenInterceptor implements HandlerInterceptor {
 
     public static final String AUTHORIZATION_HEADER = "Authorization";

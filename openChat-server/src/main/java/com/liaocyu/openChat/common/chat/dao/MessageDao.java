@@ -25,15 +25,16 @@ import java.util.Objects;
  * @author <a href="https://github.com/liaocyu">liaocyu</a>
  * @since 2024-01-03
  */
-@Service
+@Service("messageDao")
 public class MessageDao extends ServiceImpl<MessageMapper, Message> {
 
     public CursorPageBaseResp<Message> getCursorPage(Long roomId, CursorPageBaseReq request, Long lastMsgId) {
-        return CursorUtils.getCursorPageByMysql(this, request, wrapper -> {
+        CursorPageBaseResp<Message> cursorPageByMysql = CursorUtils.getCursorPageByMysql(this, request, wrapper -> {
             wrapper.eq(Message::getRoomId, roomId);
             wrapper.eq(Message::getStatus, MessageStatusEnum.NORMAL.getStatus());
             wrapper.le(Objects.nonNull(lastMsgId), Message::getId, lastMsgId);
         }, Message::getId);
+        return cursorPageByMysql;
     }
 
     /**

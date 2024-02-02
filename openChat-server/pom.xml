@@ -25,6 +25,10 @@
 
         <dependency>
             <groupId>com.liaocyu</groupId>
+            <artifactId>openChat-frequency-control</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.liaocyu</groupId>
             <artifactId>openChat-transaction</artifactId>
         </dependency>
         <dependency>
@@ -49,7 +53,6 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
-<!--            <version>5.3.19</version>-->
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

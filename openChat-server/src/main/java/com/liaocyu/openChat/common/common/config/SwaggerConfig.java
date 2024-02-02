@@ -49,7 +49,7 @@ public class SwaggerConfig {
                         .version("v1.0")
                         .description("openchat接口文档")
                         //联系人信息
-                        .contact(new Contact("liaocyu", "<http://liaocyu.cloud>", "3252507795@qq.com"))
+                        .contact(new Contact("liaocyu", "<https://liaocyu.cloud>", "3252507795@qq.com"))
                         .build())
                 .select()
                 //指定接口的位置

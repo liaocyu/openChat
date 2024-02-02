@@ -37,7 +37,7 @@ public class CursorUtils {
      */
     public static <T> CursorPageBaseResp<Pair<T, Double>> getCursorPageByRedis(CursorPageBaseReq cursorPageBaseReq, String redisKey, Function<String, T> typeConvert) {
         Set<ZSetOperations.TypedTuple<String>> typedTuples;
-        if (StrUtil.isBlank(cursorPageBaseReq.getCursor())) {//第一次  判断传入进来的游标是否为空
+        if (StrUtil.isBlank(cursorPageBaseReq.getCursor())) {//第一次
             typedTuples = RedisUtils.zReverseRangeWithScores(redisKey, cursorPageBaseReq.getPageSize());
         } else {
             typedTuples = RedisUtils.zReverseRangeByScoreWithScores(redisKey, Double.parseDouble(cursorPageBaseReq.getCursor()), cursorPageBaseReq.getPageSize());
@@ -55,14 +55,6 @@ public class CursorUtils {
         return new CursorPageBaseResp<>(cursor, isLast, result);
     }
 
-    /**
-     * @param mapper 查询 mapper
-     * @param request 游标翻页请求实体
-     * @param initWrapper MP条件构造器
-     * @param cursorColumn 游标字段类型
-     * @return
-     * @param <T> 传入的泛型，传入的查询数据库表实体映射类
-     */
     public static <T> CursorPageBaseResp<T> getCursorPageByMysql(IService<T> mapper, CursorPageBaseReq request, Consumer<LambdaQueryWrapper<T>> initWrapper, SFunction<T, ?> cursorColumn) {
         //游标字段类型
         Class<?> cursorType = LambdaUtils.getReturnType(cursorColumn);
@@ -73,9 +65,8 @@ public class CursorUtils {
         if (StrUtil.isNotBlank(request.getCursor())) {
             wrapper.lt(cursorColumn, parseCursor(request.getCursor(), cursorType));
         }
-        //游标方向 根据游标字段类型逆向排序
+        //游标方向
         wrapper.orderByDesc(cursorColumn);
-
         Page<T> page = mapper.page(request.plusPage(), wrapper);
         //取出游标
         String cursor = Optional.ofNullable(CollectionUtil.getLast(page.getRecords()))

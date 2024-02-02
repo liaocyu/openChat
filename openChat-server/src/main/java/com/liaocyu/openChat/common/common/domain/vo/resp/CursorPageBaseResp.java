@@ -22,7 +22,7 @@ import java.util.List;
 public class CursorPageBaseResp<T> {
 
     @ApiModelProperty("游标（下次翻页带上这参数）")
-    private String cursor; // 响应给前端才知道 下次从哪里开始执行
+    private String cursor;
 
     @ApiModelProperty("是否最后一页")
     private Boolean isLast = Boolean.FALSE;

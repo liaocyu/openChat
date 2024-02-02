@@ -9,7 +9,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * @author : create by lcy
  * @Project : openChat
  * @createTime : 2023/12/19 13:29
- * @description :
+ * @description : 配置所有拦截器
  */
 @Configuration
 public class InterceptorConfig implements WebMvcConfigurer {

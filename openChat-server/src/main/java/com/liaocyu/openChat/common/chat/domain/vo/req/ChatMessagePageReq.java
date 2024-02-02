@@ -22,6 +22,6 @@ import javax.validation.constraints.NotNull;
 public class ChatMessagePageReq extends CursorPageBaseReq {
 
     @NotNull
-    @ApiModelProperty("房间Id")
+    @ApiModelProperty("会话id")
     private Long roomId;
 }

@@ -154,8 +154,8 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    public CursorPageBaseResp<ChatMessageResp> getMsgPage(ChatMessagePageReq request, @Nullable Long receiveUid) {
-
+    public CursorPageBaseResp<ChatMessageResp> getMsgPage(ChatMessagePageReq request, Long receiveUid) {
+        //用最后一条消息id，来限制被踢出的人能看见的最大一条消息
         Long lastMsgId = getLastMsgId(request.getRoomId(), receiveUid);
         CursorPageBaseResp<Message> cursorPage = messageDao.getCursorPage(request.getRoomId(), request, lastMsgId);
         if (cursorPage.isEmpty()) {

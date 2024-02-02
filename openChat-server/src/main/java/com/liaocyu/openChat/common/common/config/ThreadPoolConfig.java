@@ -62,7 +62,7 @@ public class ThreadPoolConfig implements AsyncConfigurer, SecureInvokeConfigurer
         executor.setWaitForTasksToCompleteOnShutdown(true);
         executor.setCorePoolSize(16);
         executor.setMaxPoolSize(16);
-        executor.setQueueCapacity(1000);
+        executor.setQueueCapacity(1000);//支持同时推送1000人
         executor.setThreadNamePrefix("webSocket-executor-"); // 设置线程前缀 排查 cpu占用问题
         // 对于 WebSocket 的连接 如果真的推送不过去 就直接扔掉这个任务
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy());
