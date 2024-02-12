@@ -63,7 +63,7 @@ public class RecallMsgHandler extends AbstractMsgHandler<Object> {
 
     @Override
     public Object showReplyMsg(Message msg) {
-        return "语音已被撤回";
+        return "原消息已被撤回";
     }
 
     public void recall(Long recallUid, Message message) {//todo 消息覆盖问题用版本号解决✔

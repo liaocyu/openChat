@@ -1,6 +1,8 @@
 package com.liaocyu.openChat.common.user.service.adapter;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.RandomUtil;
 import com.liaocyu.openChat.common.common.domain.enums.YesOrNoEnum;
 import com.liaocyu.openChat.common.user.domain.entity.ItemConfig;
 import com.liaocyu.openChat.common.user.domain.entity.User;
@@ -11,10 +13,7 @@ import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
 import org.springframework.beans.BeanUtils;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -24,6 +23,12 @@ import java.util.stream.Collectors;
  * @description :
  */
 public class UserAdapter {
+
+    public static User buildUser(String openId) {
+        User user = new User();
+        user.setOpenId(openId);
+        return user;
+    }
     public static User buildUserSave(String openId) {
         return User.builder().openId(openId).build();
     }
@@ -34,8 +39,19 @@ public class UserAdapter {
         user.setName(userInfo.getNickname());
         user.setAvatar(userInfo.getHeadImgUrl());
         user.setSex(userInfo.getSex());
-        user.setIpInfo(user.getIpInfo());
+        if (userInfo.getNickname().length() > 6) {
+            user.setName("名字过长" + RandomUtil.randomInt(100000));
+        } else {
+            user.setName(userInfo.getNickname());
+        }
         return user;
+    }
+
+    public static UserInfoResp buildUserInfoResp(User userInfo, Integer countByValidItemId) {
+        UserInfoResp userInfoResp = new UserInfoResp();
+        BeanUtil.copyProperties(userInfo, userInfoResp);
+        userInfoResp.setModifyNameChance(countByValidItemId);
+        return userInfoResp;
     }
 
     public static UserInfoResp buildUserInfo(User user, Integer modifyNameCount) {
@@ -53,6 +69,11 @@ public class UserAdapter {
      * @return 当前用户佩戴的徽章
      */
     public static List<BadgeResp> buildBadgeResp(List<ItemConfig> itemConfigs, List<UserBackpack> backpacks, User user) {
+
+        if (ObjectUtil.isNull(user)) {
+            // 这里 user 入参可能为空，防止 NPE 问题
+            return Collections.emptyList();
+        }
 
         Set<Long> obtainItemSet = backpacks.stream().map(UserBackpack::getItemId).collect(Collectors.toSet());
         return itemConfigs.stream().map(a -> {

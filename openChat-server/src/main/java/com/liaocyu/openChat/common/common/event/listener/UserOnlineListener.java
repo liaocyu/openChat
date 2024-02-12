@@ -1,12 +1,19 @@
 package com.liaocyu.openChat.common.common.event.listener;
 
+import com.liaocyu.openChat.common.chat.service.impl.PushService;
 import com.liaocyu.openChat.common.common.event.UserOnlineEvent;
 import com.liaocyu.openChat.common.common.event.UserRegisterEvent;
 import com.liaocyu.openChat.common.user.dao.UserDao;
 import com.liaocyu.openChat.common.user.domain.entity.User;
 import com.liaocyu.openChat.common.user.domain.enums.UserActiveStatusEnum;
 import com.liaocyu.openChat.common.user.service.IpService;
+import com.liaocyu.openChat.common.user.service.adapter.WSAdapter;
+import com.liaocyu.openChat.common.user.service.cache.UserCache;
+import com.liaocyu.openChat.common.websocket.domian.enums.ChatActiveStatusEnum;
+import com.liaocyu.openChat.common.websocket.service.WebSocketService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
@@ -34,30 +41,42 @@ import org.springframework.transaction.event.TransactionalEventListener;
  *
  * @Async: 这个注解表示 saveDB() 方法将在一个单独的线程中异步执行。这可以提高性能，使方法在后台执行而不会阻塞主线程。
  */
-@Component
+@Slf4j
+@Component("userOnlineListener")
 public class UserOnlineListener {
-
-    private final IpService ipService;
-    private final UserDao userDao;
-
     @Autowired
-    public UserOnlineListener(IpService ipService , UserDao userDao) {
-        this.ipService = ipService;
-        this.userDao = userDao;
+    private WebSocketService webSocketService;
+    @Autowired
+    private UserDao userDao;
+    @Autowired
+    private UserCache userCache;
+    @Autowired
+    private WSAdapter wsAdapter;
+    @Autowired
+    private IpService ipService;
+    @Autowired
+    private PushService pushService;
+
+    @Async
+    @EventListener(classes = UserOnlineEvent.class)
+    public void saveRedisAndPush(UserOnlineEvent event) {
+        User user = event.getUser();
+        userCache.online(user.getId(), user.getLastOptTime());
+        //推送给所有在线用户，该用户登录成功
+        pushService.sendPushMsg(wsAdapter.buildOnlineNotifyResp(event.getUser()));
     }
 
     @Async
-    @TransactionalEventListener(classes = UserOnlineEvent.class , phase = TransactionPhase.AFTER_COMMIT , fallbackExecution = true)
+    @EventListener(classes = UserOnlineEvent.class)
     public void saveDB(UserOnlineEvent event) {
         User user = event.getUser();
         User update = new User();
         update.setId(user.getId());
         update.setLastOptTime(user.getLastOptTime());
         update.setIpInfo(user.getIpInfo());
-        update.setActiveStatus(UserActiveStatusEnum.ONLINE.getStatus());
+        update.setActiveStatus(ChatActiveStatusEnum.ONLINE.getStatus());
         userDao.updateById(update);
-        // 用户ip详情的解析
-        ipService.refreshDetailAsync(user.getId());
+        //更新用户ip详情
+        ipService.refreshIpDetailAsync(user.getId());
     }
-
 }

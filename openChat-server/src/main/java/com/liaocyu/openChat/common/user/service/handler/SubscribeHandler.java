@@ -43,8 +43,13 @@ public class SubscribeHandler extends AbstractHandler {
             return responseResult;
         }
 
-        return  TextBuilder.build("感谢关注",  wxMessage);
-    }
+        try {
+            return new TextBuilder().build("感谢关注", wxMessage);
+        } catch (Exception e) {
+            this.logger.error(e.getMessage(), e);
+        }
+
+        return null;    }
 
     /**
      * 处理特殊请求，比如如果是扫码进来的，可以做相应处理

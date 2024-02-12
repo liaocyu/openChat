@@ -17,9 +17,9 @@ import java.util.stream.Collectors;
  * @author : create by lcy
  * @Project : openChat
  * @createTime : 2024/1/9 16:24
- * @description :
+ * @description : 用户基本信息的缓存
  */
-@Component
+@Component("userInfoCache")
 public class UserInfoCache extends AbstractRedisStringCache<Long , User> {
 
     private final UserDao userDao;

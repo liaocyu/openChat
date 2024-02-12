@@ -43,6 +43,8 @@ public interface WebSocketService {
      */
     void authorize(Channel channel, String token);
 
+    Boolean scanSuccess(Integer loginCode);
+
     void sendMsgToAll(WSBaseResp<?> msg);
 
     /**
@@ -51,4 +53,7 @@ public interface WebSocketService {
      * @param wsBaseResp 发送的消息体
      * @param skipUid    需要跳过的人
      */
-    void sendToAllOnline(WSBaseResp<?> wsBaseResp, Long skipUid);}
+    void sendToAllOnline(WSBaseResp<?> wsBaseResp, Long skipUid);
+
+    void sendToUid(WSBaseResp<?> wsBaseMsg, Long uid);
+}

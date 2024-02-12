@@ -1,5 +1,6 @@
 package com.liaocyu.openChat.common.common.event.listener;
 
+import com.liaocyu.openChat.common.chat.dao.MessageDao;
 import com.liaocyu.openChat.common.common.event.UserBlackEvent;
 import com.liaocyu.openChat.common.common.event.UserOnlineEvent;
 import com.liaocyu.openChat.common.common.event.UserRegisterEvent;
@@ -8,15 +9,20 @@ import com.liaocyu.openChat.common.user.domain.entity.User;
 import com.liaocyu.openChat.common.user.domain.enums.UserActiveStatusEnum;
 import com.liaocyu.openChat.common.user.service.IpService;
 import com.liaocyu.openChat.common.user.service.cache.UserCache;
+import com.liaocyu.openChat.common.websocket.domian.enums.WSRespTypeEnum;
+import com.liaocyu.openChat.common.websocket.domian.vo.resp.WSBaseResp;
+import com.liaocyu.openChat.common.websocket.domian.vo.resp.ws.WSBlack;
 import com.liaocyu.openChat.common.websocket.service.WebSocketService;
 import com.liaocyu.openChat.common.websocket.service.adapter.WebSocketAdapter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 /**
+ * TODO 这里也许有错误
  * @author : create by lcy
  * @Project : openChat
  * @createTime : 2023/12/25 17:24
@@ -38,18 +44,45 @@ import org.springframework.transaction.event.TransactionalEventListener;
  *
  * @Async: 这个注解表示 sendMsg()、changeUserStatus()、evictCache() 方法将在一个单独的线程中异步执行。这可以提高性能，使方法在后台执行而不会阻塞主线程。
  */
-@Component
+@Component("userBlackListener")
 public class UserBlackListener {
 
     private final WebSocketService webSocketService;
     private final UserDao userDao;
     private final UserCache userCache;
+    private final MessageDao messageDao;
 
     @Autowired
-    public UserBlackListener(WebSocketService webSocketService , UserDao userDao , UserCache userCache) {
+    public UserBlackListener(WebSocketService webSocketService , UserDao userDao ,
+                             UserCache userCache , MessageDao messageDao) {
         this.webSocketService = webSocketService;
         this.userDao = userDao;
         this.userCache = userCache;
+        this.messageDao = messageDao;
+    }
+
+    @Async
+    @EventListener(classes = UserBlackEvent.class)
+    public void refreshRedis(UserBlackEvent event) {
+        userCache.evictBlackMap();
+        userCache.remove(event.getUser().getId());
+    }
+
+    @Async
+    @EventListener(classes = UserBlackEvent.class)
+    public void deleteMsg(UserBlackEvent event) {
+        messageDao.invalidByUid(event.getUser().getId());
+    }
+
+    @Async
+    @EventListener(classes = UserBlackEvent.class)
+    public void sendPush(UserBlackEvent event) {
+        Long uid = event.getUser().getId();
+        WSBaseResp<WSBlack> resp = new WSBaseResp<>();
+        WSBlack black = new WSBlack(uid);
+        resp.setData(black);
+        resp.setType(WSRespTypeEnum.BLACK.getType());
+        webSocketService.sendToAllOnline(resp, uid);
     }
 
     /**

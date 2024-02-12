@@ -8,9 +8,11 @@ import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import static org.apache.tomcat.jni.SSL.setPassword;
+
 /**
  * Description:
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
+ * Author: <a href="https://github.com/liaocyu">liaocyu</a>
  * Date: 2023-04-22
  */
 @Configuration
@@ -23,8 +25,8 @@ public class RedissonConfig {
         Config config = new Config();
         config.useSingleServer()
                 .setAddress("redis://" + redisProperties.getHost() + ":" + redisProperties.getPort())
-                .setDatabase(redisProperties.getDatabase());
-                //.setPassword(redisProperties.getPassword())
+                .setDatabase(redisProperties.getDatabase())
+                .setPassword(redisProperties.getPassword());
 
         return Redisson.create(config);
     }

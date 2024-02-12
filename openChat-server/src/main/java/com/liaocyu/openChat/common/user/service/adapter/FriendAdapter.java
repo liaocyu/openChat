@@ -20,7 +20,7 @@ import static com.liaocyu.openChat.common.user.domain.enums.ApplyTypeEnum.ADD_FR
  * @author : create by lcy
  * @Project : openChat
  * @createTime : 2024/1/4 10:08
- * @description :
+ * @description : 好友适配器
  */
 public class FriendAdapter {
 

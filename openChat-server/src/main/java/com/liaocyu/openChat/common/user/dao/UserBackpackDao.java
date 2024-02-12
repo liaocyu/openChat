@@ -73,6 +73,14 @@ public class UserBackpackDao extends ServiceImpl<UserBackpackMapper, UserBackpac
                 .list();
     }
 
+    public List<UserBackpack> getByItemIds(List<Long> uids, List<Long> itemIds) {
+        return lambdaQuery().in(UserBackpack::getUid, uids)
+                .in(UserBackpack::getItemId, itemIds)
+                .eq(UserBackpack::getStatus, YesOrNoEnum.NO.getStatus())
+                .list();
+    }
+
+
     /**
      * 判断幂等键是否存在
      * @param idempotent 幂等键
@@ -81,5 +89,12 @@ public class UserBackpackDao extends ServiceImpl<UserBackpackMapper, UserBackpac
         return lambdaQuery()
                 .eq(UserBackpack::getIdempotent, idempotent)
                 .one();
+    }
+
+    public boolean invalidItem(Long id) {
+        UserBackpack update = new UserBackpack();
+        update.setId(id);
+        update.setStatus(YesOrNoEnum.YES.getStatus());
+        return updateById(update);
     }
 }

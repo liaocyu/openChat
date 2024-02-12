@@ -30,10 +30,15 @@ public abstract class AbstractMsgMarkStrategy {
     private MessageMarkDao messageMarkDao;
     private ApplicationEventPublisher applicationEventPublisher;
     @Autowired
-    public AbstractMsgMarkStrategy(MessageMarkDao messageMarkDao  , ApplicationEventPublisher applicationEventPublisher) {
+    public void setMessageMarkDao(MessageMarkDao messageMarkDao) {
         this.messageMarkDao = messageMarkDao;
+    }
+
+    @Autowired
+    public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
         this.applicationEventPublisher = applicationEventPublisher;
     }
+
 
     /**
      * 消息类型

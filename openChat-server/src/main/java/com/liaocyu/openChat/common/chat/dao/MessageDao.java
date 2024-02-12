@@ -76,4 +76,11 @@ public class MessageDao extends ServiceImpl<MessageMapper, Message> {
                 .gt(Objects.nonNull(readTime), Message::getCreateTime, readTime)
                 .count();
     }
+
+    public void invalidByUid(Long uid) {
+        lambdaUpdate()
+                .eq(Message::getFromUid, uid)
+                .set(Message::getStatus, MessageStatusEnum.DELETE.getStatus())
+                .update();
+    }
 }

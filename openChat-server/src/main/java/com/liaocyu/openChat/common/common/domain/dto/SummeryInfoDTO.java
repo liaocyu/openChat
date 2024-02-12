@@ -33,7 +33,7 @@ public class SummeryInfoDTO {
     private String locPlace;
     @ApiModelProperty(value = "佩戴的徽章id")
     private Long wearingItemId;
-    @ApiModelProperty(value = "用户拥有的徽章")
+    @ApiModelProperty(value = "用户拥有的徽章id列表")
     List<Long> itemIds;
 
     public static SummeryInfoDTO skip(Long uid) {

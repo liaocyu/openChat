@@ -8,4 +8,6 @@ package com.liaocyu.openChat.common.user.service;
  */
 public interface IpService {
     void refreshDetailAsync(Long id);
+
+    void refreshIpDetailAsync(Long id);
 }

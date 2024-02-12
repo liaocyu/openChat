@@ -1,14 +1,17 @@
 package com.liaocyu.openChat.common.user.service.impl;
 
 import cn.hutool.core.thread.NamedThreadFactory;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.liaocyu.openChat.common.common.domain.vo.resp.ApiResult;
+import com.liaocyu.openChat.common.common.handler.GlobalUncaughtExceptionHandler;
 import com.liaocyu.openChat.common.user.dao.UserDao;
 import com.liaocyu.openChat.common.user.domain.entity.IpDetail;
 import com.liaocyu.openChat.common.user.domain.entity.IpInfo;
 import com.liaocyu.openChat.common.user.domain.entity.User;
 import com.liaocyu.openChat.common.user.service.IpService;
+import com.liaocyu.openChat.common.user.service.cache.UserCache;
 import com.liaocyu.openchat.utils.JsonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -33,11 +36,19 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class IpServiceImpl implements IpService, DisposableBean {
 
+    private static final ExecutorService EXECUTOR = new ThreadPoolExecutor(1, 1,
+            0L, TimeUnit.MILLISECONDS,
+            new LinkedBlockingQueue<>(500),
+            new NamedThreadFactory("refresh-ipDetail", null, false,
+                    GlobalUncaughtExceptionHandler.getInstance()));
+
     private final UserDao userDao;
+    private final UserCache userCache;
 
     @Autowired
-    public IpServiceImpl(UserDao userDao) {
+    public IpServiceImpl(UserDao userDao ,UserCache userCache ) {
         this.userDao = userDao;
+        this.userCache = userCache;
     }
 
     private static ExecutorService executor = new ThreadPoolExecutor(1, 1,
@@ -66,6 +77,48 @@ public class IpServiceImpl implements IpService, DisposableBean {
                 userDao.updateById(update);
             }
         });
+    }
+
+    @Override
+    public void refreshIpDetailAsync(Long uid) {
+        EXECUTOR.execute(() -> {
+            User user = userDao.getById(uid);
+            IpInfo ipInfo = user.getIpInfo();
+            if (Objects.isNull(ipInfo)) {
+                return;
+            }
+            String ip = ipInfo.needRefreshIp();
+            if (StrUtil.isBlank(ip)) {
+                return;
+            }
+            IpDetail ipDetail = TryGetIpDetailOrNullTreeTimes(ip);
+            if (Objects.nonNull(ipDetail)) {
+                ipInfo.refreshIpDetail(ipDetail);
+                User update = new User();
+                update.setId(uid);
+                update.setIpInfo(ipInfo);
+                userDao.updateById(update);
+                userCache.userInfoChange(uid);
+            } else {
+                log.error("get ip detail fail ip:{},uid:{}", ip, uid);
+            }
+
+        });
+    }
+
+    private static IpDetail TryGetIpDetailOrNullTreeTimes(String ip) {
+        for (int i = 0; i < 3; i++) {
+            IpDetail ipDetail = getIpDetailOrNull(ip);
+            if (Objects.nonNull(ipDetail)) {
+                return ipDetail;
+            }
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
     }
 
     private static IpDetail tryGetIpDetailOrNullTreeTimes(String ip) {

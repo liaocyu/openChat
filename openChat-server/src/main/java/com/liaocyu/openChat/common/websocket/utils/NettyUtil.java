@@ -1,6 +1,7 @@
 package com.liaocyu.openChat.common.websocket.utils;
 
 import io.netty.channel.Channel;
+import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
 import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
 
@@ -21,6 +22,8 @@ public class NettyUtil {
     public static AttributeKey<String> TOKEN = AttributeKey.valueOf("token");
     // 标识channel属性中用户的 ip 的键
     public static AttributeKey<String> IP = AttributeKey.valueOf("ip");
+    public static AttributeKey<Long> UID = AttributeKey.valueOf("uid");
+    public static AttributeKey<WebSocketServerHandshaker> HANDSHAKER_ATTR_KEY = AttributeKey.valueOf(WebSocketServerHandshaker.class, "HANDSHAKER");
 
     public static <T> void setAttr(Channel channel , AttributeKey<T> key , T value) {
         Attribute<T> attr = channel.attr(key); // 获取 Attribute 对象

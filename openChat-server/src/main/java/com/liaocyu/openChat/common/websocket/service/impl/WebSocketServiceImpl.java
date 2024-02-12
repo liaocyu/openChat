@@ -1,6 +1,7 @@
 package com.liaocyu.openChat.common.websocket.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.json.JSONUtil;
 import com.github.benmanes.caffeine.cache.Cache;
@@ -12,6 +13,8 @@ import com.liaocyu.openChat.common.user.domain.entity.User;
 import com.liaocyu.openChat.common.user.domain.enums.RoleEnum;
 import com.liaocyu.openChat.common.user.service.RoleService;
 import com.liaocyu.openChat.common.user.service.LoginService;
+import com.liaocyu.openChat.common.user.service.adapter.WSAdapter;
+import com.liaocyu.openChat.common.user.service.cache.UserCache;
 import com.liaocyu.openChat.common.websocket.domian.dto.WSChannelExtraDTO;
 import com.liaocyu.openChat.common.websocket.domian.vo.resp.WSBaseResp;
 import com.liaocyu.openChat.common.websocket.service.WebSocketService;
@@ -19,6 +22,7 @@ import com.liaocyu.openChat.common.websocket.service.adapter.WebSocketAdapter;
 import com.liaocyu.openChat.common.websocket.utils.NettyUtil;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
+import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.result.WxMpQrCodeTicket;
@@ -27,6 +31,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -45,7 +50,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * 使用了两个 Map；使用 caffeine 来关联登录码code和channel
  * 使用 ConcurrentHashMap 来关联 channel 和 WSChannelExtraDTO 实体类对象
  */
-@Service
+@Component("webSocketService")
+@Slf4j
 public class WebSocketServiceImpl implements WebSocketService {
 
     @Autowired
@@ -54,6 +60,9 @@ public class WebSocketServiceImpl implements WebSocketService {
 
     @Autowired
     UserDao userDao;
+
+    @Autowired
+    private UserCache userCache;
 
     @Autowired
     LoginService loginService;
@@ -118,8 +127,9 @@ public class WebSocketServiceImpl implements WebSocketService {
         } catch (WxErrorException e) {
             throw new RuntimeException(e);
         }
-        // 3、把码推给前端
-        sendMsg(channel, WebSocketAdapter.buildResp(wxMpQrCodeTicket));
+        // 3、把码推给前端 TODO 这里也许有问题
+        // sendMsg(channel, WebSocketAdapter.buildResp(wxMpQrCodeTicket));
+        sendMsg(channel, WSAdapter.buildLoginResp(wxMpQrCodeTicket));
     }
 
     @Override
@@ -195,6 +205,17 @@ public class WebSocketServiceImpl implements WebSocketService {
         }
     }
 
+    // TODO 如果报错，就删掉
+    @Override
+    public Boolean scanSuccess(Integer loginCode) {
+        Channel channel = WAIT_LOGIN_MAP.getIfPresent(loginCode);
+        if (Objects.nonNull(channel)) {
+            sendMsg(channel, WSAdapter.buildScanSuccessResp());
+            return Boolean.TRUE;
+        }
+        return Boolean.FALSE;
+    }
+
     /**
      * 发送消息给所有在线用户
      *
@@ -219,17 +240,29 @@ public class WebSocketServiceImpl implements WebSocketService {
         });
     }
 
+    @Override
+    public void sendToUid(WSBaseResp<?> wsBaseResp, Long uid) {
+        CopyOnWriteArrayList<Channel> channels = ONLINE_UID_MAP.get(uid);
+        if (CollectionUtil.isEmpty(channels)) {
+            log.info("用户：{}不在线", uid);
+            return;
+        }
+        channels.forEach(channel -> {
+            threadPoolTaskExecutor.execute(() -> sendMsg(channel, wsBaseResp));
+        });
+    }
+
     /**
      * @param channel websocket 连接
      * @param user    当前登录用户
      * @param token   用户token
      */
-    private void loginSuccess(Channel channel, User user, String token) {
+    /*private void loginSuccess(Channel channel, User user, String token) {
 
         // 用户上线成功
         // 1、保存channel的对应的 uid
         WSChannelExtraDTO wsChannelExtraDTO = ONLINE_WS_MAP.get(channel);
-        wsChannelExtraDTO.setUid(/*user.getId()*/Optional.ofNullable(user).map(User::getId).orElse(null));
+        wsChannelExtraDTO.setUid(*//*user.getId()*//*Optional.ofNullable(user).map(User::getId).orElse(null));
         // 2、推送成功消息
         // 判断用户是否有权限
         sendMsg(channel, WebSocketAdapter.buildResp(user, token, roleService.hasPower(user.getId(), RoleEnum.CHAT_MANAGER)));
@@ -238,6 +271,37 @@ public class WebSocketServiceImpl implements WebSocketService {
         user.refreshIp(NettyUtil.getAttr(channel, NettyUtil.IP));
 
         applicationEventPublisher.publishEvent(new UserOnlineEvent(this, user));
+    }*/
+
+    // TODO 不行就换成上面的 取消注释掉
+    private void loginSuccess(Channel channel, User user, String token) {
+        //更新上线列表
+        online(channel, user.getId());
+        //返回给用户登录成功
+        boolean hasPower = roleService.hasPower(user.getId(), RoleEnum.CHAT_MANAGER);
+        //发送给对应的用户
+        sendMsg(channel, WSAdapter.buildLoginSuccessResp(user, token, hasPower));
+        //发送用户上线事件
+        boolean online = userCache.isOnline(user.getId());
+        if (!online) {
+            user.setLastOptTime(new Date());
+            user.refreshIp(NettyUtil.getAttr(channel, NettyUtil.IP));
+            applicationEventPublisher.publishEvent(new UserOnlineEvent(this, user));
+        }
+    }
+
+    private void online(Channel channel, Long uid) {
+        getOrInitChannelExt(channel).setUid(uid);
+        ONLINE_UID_MAP.putIfAbsent(uid, new CopyOnWriteArrayList<>());
+        ONLINE_UID_MAP.get(uid).add(channel);
+        NettyUtil.setAttr(channel, NettyUtil.UID, uid);
+    }
+
+    private WSChannelExtraDTO getOrInitChannelExt(Channel channel) {
+        WSChannelExtraDTO wsChannelExtraDTO =
+                ONLINE_WS_MAP.getOrDefault(channel, new WSChannelExtraDTO());
+        WSChannelExtraDTO old = ONLINE_WS_MAP.putIfAbsent(channel, wsChannelExtraDTO);
+        return ObjectUtil.isNull(old) ? wsChannelExtraDTO : old;
     }
 
     // 用户发送消息逻辑

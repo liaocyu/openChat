@@ -16,7 +16,7 @@ import java.util.List;
  * @createTime : 2023/12/22 16:20
  * @description :
  */
-@Component
+@Component("itemCache")
 public class ItemCache {
 
     @Autowired

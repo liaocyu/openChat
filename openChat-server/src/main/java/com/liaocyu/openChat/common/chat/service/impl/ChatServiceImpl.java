@@ -145,7 +145,8 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     public ChatMessageResp getMsgResp(Long msgId, Long receiveUid) {
-        return null;
+        Message msg = messageDao.getById(msgId);
+        return getMsgResp(msg, receiveUid);
     }
 
     @Override
@@ -200,7 +201,7 @@ public class ChatServiceImpl implements ChatService {
      */
     @Override
     public ChatMemberStatisticResp getMemberStatistic() {
-        System.out.println(Thread.currentThread().getName());
+        // System.out.println(Thread.currentThread().getName());
         Long onlineNum = userCache.getOnlineNum();
 //        Long offlineNum = userCache.getOfflineNum();不展示总人数
         ChatMemberStatisticResp resp = new ChatMemberStatisticResp();

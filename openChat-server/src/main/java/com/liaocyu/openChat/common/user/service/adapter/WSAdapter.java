@@ -11,10 +11,8 @@ import com.liaocyu.openChat.common.user.domain.entity.User;
 import com.liaocyu.openChat.common.websocket.domian.enums.ChatActiveStatusEnum;
 import com.liaocyu.openChat.common.websocket.domian.enums.WSRespTypeEnum;
 import com.liaocyu.openChat.common.websocket.domian.vo.resp.WSBaseResp;
-import com.liaocyu.openChat.common.websocket.domian.vo.resp.ws.WSFriendApply;
-import com.liaocyu.openChat.common.websocket.domian.vo.resp.ws.WSMsgMark;
-import com.liaocyu.openChat.common.websocket.domian.vo.resp.ws.WSMsgRecall;
-import com.liaocyu.openChat.common.websocket.domian.vo.resp.ws.WSOnlineOfflineNotify;
+import com.liaocyu.openChat.common.websocket.domian.vo.resp.ws.*;
+import me.chanjar.weixin.mp.bean.result.WxMpQrCodeTicket;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -36,6 +34,32 @@ public class WSAdapter {
         this.chatService = chatService;
     }
 
+    public static WSBaseResp<WSLoginUrl> buildLoginResp(WxMpQrCodeTicket wxMpQrCodeTicket) {
+        WSBaseResp<WSLoginUrl> wsBaseResp = new WSBaseResp<>();
+        wsBaseResp.setType(WSRespTypeEnum.LOGIN_URL.getType());
+        wsBaseResp.setData(WSLoginUrl.builder().loginUrl(wxMpQrCodeTicket.getUrl()).build());
+        return wsBaseResp;
+    }
+
+    public static WSBaseResp<WSLoginSuccess> buildLoginSuccessResp(User user, String token, boolean hasPower) {
+        WSBaseResp<WSLoginSuccess> wsBaseResp = new WSBaseResp<>();
+        wsBaseResp.setType(WSRespTypeEnum.LOGIN_SUCCESS.getType());
+        WSLoginSuccess wsLoginSuccess = WSLoginSuccess.builder()
+                .avatar(user.getAvatar())
+                .name(user.getName())
+                .token(token)
+                .uid(user.getId())
+                .power(hasPower ? 1 : 0)
+                .build();
+        wsBaseResp.setData(wsLoginSuccess);
+        return wsBaseResp;
+    }
+
+    public static WSBaseResp buildScanSuccessResp() {
+        WSBaseResp wsBaseResp = new WSBaseResp();
+        wsBaseResp.setType(WSRespTypeEnum.LOGIN_SCAN_SUCCESS.getType());
+        return wsBaseResp;
+    }
     public static WSBaseResp<WSMsgMark> buildMsgMarkSend(ChatMessageMarkDTO dto, Integer markCount) {
         WSMsgMark.WSMsgMarkItem item = new WSMsgMark.WSMsgMarkItem();
         BeanUtils.copyProperties(dto, item);
@@ -91,6 +115,31 @@ public class WSAdapter {
         BeanUtil.copyProperties(user, info);
         info.setUid(user.getId());
         info.setActiveStatus(ChatActiveStatusEnum.OFFLINE.getStatus());
+        info.setLastOptTime(user.getLastOptTime());
+        return info;
+    }
+
+    public static WSBaseResp<WSLoginSuccess> buildInvalidateTokenResp() {
+        WSBaseResp<WSLoginSuccess> wsBaseResp = new WSBaseResp<>();
+        wsBaseResp.setType(WSRespTypeEnum.INVALIDATE_TOKEN.getType());
+        return wsBaseResp;
+    }
+
+    public WSBaseResp<WSOnlineOfflineNotify> buildOnlineNotifyResp(User user) {
+        WSBaseResp<WSOnlineOfflineNotify> wsBaseResp = new WSBaseResp<>();
+        wsBaseResp.setType(WSRespTypeEnum.ONLINE_OFFLINE_NOTIFY.getType());
+        WSOnlineOfflineNotify onlineOfflineNotify = new WSOnlineOfflineNotify();
+        onlineOfflineNotify.setChangeList(Collections.singletonList(buildOnlineInfo(user)));
+        assembleNum(onlineOfflineNotify);
+        wsBaseResp.setData(onlineOfflineNotify);
+        return wsBaseResp;
+    }
+
+    private static ChatMemberResp buildOnlineInfo(User user) {
+        ChatMemberResp info = new ChatMemberResp();
+        BeanUtil.copyProperties(user, info);
+        info.setUid(user.getId());
+        info.setActiveStatus(ChatActiveStatusEnum.ONLINE.getStatus());
         info.setLastOptTime(user.getLastOptTime());
         return info;
     }

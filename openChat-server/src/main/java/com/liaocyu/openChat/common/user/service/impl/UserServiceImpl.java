@@ -6,6 +6,7 @@ import com.liaocyu.openChat.common.common.domain.dto.SummeryInfoDTO;
 import com.liaocyu.openChat.common.common.event.UserBlackEvent;
 import com.liaocyu.openChat.common.common.event.UserRegisterEvent;
 import com.liaocyu.openChat.common.common.utils.AssertUtil;
+import com.liaocyu.openChat.common.sensitive.bootstrap.SensitiveWordBs;
 import com.liaocyu.openChat.common.user.dao.BlackDao;
 import com.liaocyu.openChat.common.user.dao.ItemConfigDao;
 import com.liaocyu.openChat.common.user.dao.UserBackpackDao;
@@ -16,6 +17,7 @@ import com.liaocyu.openChat.common.user.domain.enums.ItemEnum;
 import com.liaocyu.openChat.common.user.domain.enums.ItemTypeEnum;
 import com.liaocyu.openChat.common.user.domain.vo.req.user.BlackUserReq;
 import com.liaocyu.openChat.common.user.domain.vo.req.user.ItemInfoReq;
+import com.liaocyu.openChat.common.user.domain.vo.req.user.ModifyNameReq;
 import com.liaocyu.openChat.common.user.domain.vo.req.user.SummeryInfoReq;
 import com.liaocyu.openChat.common.user.domain.vo.resp.BadgeResp;
 import com.liaocyu.openChat.common.user.domain.vo.resp.UserInfoResp;
@@ -60,6 +62,8 @@ public class UserServiceImpl implements UserService {
     UserCache userCache;
     @Autowired
     UserSummaryCache userSummaryCache;
+    @Autowired
+    private SensitiveWordBs sensitiveWordBs;
 
 
 
@@ -77,14 +81,44 @@ public class UserServiceImpl implements UserService {
     public UserInfoResp getUserInfo(Long uid) {
         User user = userDao.getById(uid);
         Integer modifyNameCount = userBackpackDao.getCountByValidItemId(uid, ItemEnum.MODIFY_NAME_CARD.getId());
+        return UserAdapter.buildUserInfoResp(user, modifyNameCount);
+        // TODO 如果出错了 撤销注释
+        // return UserAdapter.buildUserInfo(user, modifyNameCount);
+    }
 
-        return UserAdapter.buildUserInfo(user, modifyNameCount);
+    @Override
+    public void modifyName(Long uid, String name) {
+
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     @RedissonLock(key = "#uid")
+    public void modifyName(Long uid, ModifyNameReq req) {
+        //判断名字是不是重复
+        String newName = req.getName();
+        AssertUtil.isFalse(sensitiveWordBs.hasSensitiveWord(newName), "名字中包含敏感词，请重新输入"); // 判断名字中有没有敏感词
+        User oldUser = userDao.getByName(newName);
+        AssertUtil.isEmpty(oldUser, "名字已经被抢占了，请换一个哦~~");
+        //判断改名卡够不够
+        UserBackpack firstValidItem = userBackpackDao.getFirstValidItem(uid, ItemEnum.MODIFY_NAME_CARD.getId());
+        AssertUtil.isNotEmpty(firstValidItem, "改名次数不够了，等后续活动送改名卡哦");
+        //使用改名卡
+        boolean useSuccess = userBackpackDao.invalidItem(firstValidItem.getId());
+        if (useSuccess) {//用乐观锁，就不用分布式锁了
+            //改名
+            userDao.modifyName(uid, req.getName());
+            //删除缓存
+            userCache.userInfoChange(uid);
+        }
+    }
+
+    // TODO 如果失效了 撤销掉注释
+    /*@Override
+    @Transactional(rollbackFor = Exception.class)
+    @RedissonLock(key = "#uid")
     public void modifyName(Long uid, String name) {
+        //判断名字是不是重复
         User oldUser = userDao.getByName(name);
         AssertUtil.isEmpty(oldUser, "名字已经被占用了，请重新换个名字");
         UserBackpack userBackpack = userBackpackDao.getFirstValidItem(uid, ItemEnum.MODIFY_NAME_CARD.getId());
@@ -95,7 +129,9 @@ public class UserServiceImpl implements UserService {
             // 改名
             userDao.modifyName(uid, name);
         }
-    }
+    }*/
+
+
 
     @Override
     public List<BadgeResp> badges(Long uid) {

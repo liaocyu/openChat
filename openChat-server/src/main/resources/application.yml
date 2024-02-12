@@ -5,24 +5,24 @@ spring:
   application:
     name: openchat
   datasource:
-    url: jdbc:mysql://${mallchat.mysql.ip}:${mallchat.mysql.port}/${mallchat.mysql.db}?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
-    username: ${mallchat.mysql.username}
-    password: ${mallchat.mysql.password}
+    url: jdbc:mysql://${openchat.mysql.ip}:${openchat.mysql.port}/${openchat.mysql.db}?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    username: ${openchat.mysql.username}
+    password: ${openchat.mysql.password}
     driver-class-name: com.mysql.cj.jdbc.Driver
   mvc:
     pathmatch:
       matching-strategy: ANT_PATH_MATCHER
   redis:
     # Redis服务器地址
-    host: ${mallchat.redis.host}
+    host: ${openchat.redis.host}
     # Redis服务器端口号
-    port: ${mallchat.redis.port}
+    port: ${openchat.redis.port}
     # 使用的数据库索引，默认是0
     database: 0
     # 连接超时时间
     timeout: 1800000
     # 设置密码
-    #password: ${mallchat.redis.password}
+    password: ${openchat.redis.password}
   jackson:
     serialization:
       write-dates-as-timestamps: true
@@ -30,15 +30,15 @@ spring:
 wx:
   mp:
     #    callback: http://f4cd-113-92-129-127.ngrok.io
-    callback: ${mallchat.wx.callback}
+    callback: ${openchat.wx.callback}
     configs:
-      - appId: ${mallchat.wx.appId} # 第一个公众号的appid
-        secret: ${mallchat.wx.secret} # 公众号的appsecret
-        token: ${mallchat.wx.token} # 接口配置里的Token值
-        aesKey: ${mallchat.wx.aesKey} # 接口配置里的EncodingAESKey值
+      - appId: ${openchat.wx.appId} # 第一个公众号的appid
+        secret: ${openchat.wx.secret} # 公众号的appsecret
+        token: ${openchat.wx.token} # 接口配置里的Token值
+        aesKey: ${openchat.wx.aesKey} # 接口配置里的EncodingAESKey值
 
 jwt:
-  secret: ${mallchat.jwt.secret}
+  secret: ${openchat.jwt.secret}
 
 # rocketmq配置
 rocketmq:

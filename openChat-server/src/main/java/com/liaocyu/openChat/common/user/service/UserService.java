@@ -5,6 +5,7 @@ import com.liaocyu.openChat.common.common.domain.dto.SummeryInfoDTO;
 import com.liaocyu.openChat.common.user.domain.entity.User;
 import com.liaocyu.openChat.common.user.domain.vo.req.user.BlackUserReq;
 import com.liaocyu.openChat.common.user.domain.vo.req.user.ItemInfoReq;
+import com.liaocyu.openChat.common.user.domain.vo.req.user.ModifyNameReq;
 import com.liaocyu.openChat.common.user.domain.vo.req.user.SummeryInfoReq;
 import com.liaocyu.openChat.common.user.domain.vo.resp.BadgeResp;
 import com.liaocyu.openChat.common.user.domain.vo.resp.UserInfoResp;
@@ -42,6 +43,8 @@ public interface UserService {
      * @param name 用户修改的用户名
      */
     void modifyName(Long uid, String name);
+
+    void modifyName(Long uid, ModifyNameReq req);
 
     List<BadgeResp> badges(Long uid);
 
